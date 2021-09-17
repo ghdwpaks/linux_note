@@ -1,0 +1,9 @@
+rmdir
+    -remove directory 디렉토리 샂게
+    -디렉토리 내부에 다른 파일 / 디렉토리가 있다면 삭제가 불가능하다
+    -옵션
+        -p : 디렉토리 삭제 시도 후 상위 디렉토리가 비어 있는 경우 함께 삭제
+        
+    -예시
+    rmdir ./itbank4/itbank5
+    rmdir ./*

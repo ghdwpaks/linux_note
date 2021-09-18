@@ -1,0 +1,8 @@
+tail
+    -파일의 마지막 줄부터 10줄 출력
+    -옵션
+        -숫자 : 숫자만큼 줄 출력
+    -예시
+    tail hello.txt
+    tail -30 hello.txt
+    

@@ -1,1 +1,15 @@
 alias
+    -임의의 키워드에 명령어[에 옵션까지] 등록함
+    -해당 키워드로 등록된 명령을 대체해서 사용함
+    
+    -형식
+        alias                           : 등록된 내용 확인
+        alias 키워드='명령어 [옵션]'    : 키워드 등록
+
+    -예시
+        alias
+        alias p="pwd"
+        alias p='pwd'
+        alias lll = "ls -alR"
+        
+

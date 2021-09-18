@@ -1,0 +1,11 @@
+head
+    -파일의 첫 줄부터 10줄 출력
+    
+    -옵션
+        -숫자 : 숫자만큼의 줄 출력
+
+    -예시
+    head hello.txt
+    head -20 hello.txt
+    head -30 hello.txt
+    

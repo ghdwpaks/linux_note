@@ -1,0 +1,24 @@
+wc
+    -파일의 내용이 몇 줄, 몇 단어, 몇 글자인지 출력함
+    -예시
+        l : 몇 줄인지 출력(줄은 enter를 기준으로 구분)
+        w : 몇 단어인지 출력(단어는 spacebar , enter를 기준으로 구분. enter또한 하나의 단어로써 취급한다.)
+        c : 몇 글자인지 출력(공백문자=sapcebar, 개행문자=enter 각각 한 글자로 취급)
+
+
+    
+    
+    예시:
+    wc hello.txt
+
+    출력 예시:
+     34 99   511  hello.txt
+     줄 단어 글자 검사한 파일
+
+    
+    
+    
+    추가예시 :
+        wc -l hello.txt
+        wc -w hello.txt
+        wc -c hello.txt

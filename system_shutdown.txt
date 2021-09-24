@@ -1,0 +1,3 @@
+shutdown -h new
+poweroff
+init 0

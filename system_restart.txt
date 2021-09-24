@@ -1,0 +1,3 @@
+shutdown -r now
+reboot
+init 6

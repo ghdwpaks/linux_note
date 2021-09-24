@@ -1,0 +1,12 @@
+rdate
+    -인터넷에 존재하는 time 서버의 날짜와 시간을 출력함
+
+    -형식
+        radte [옵션] <time 서버 주소>
+
+    -옵션
+        s : time 서버의 날짜와 시간을 현재 장치에 적용시킴
+
+    -예시
+    rdate time.bora.net
+    rdate -s time.bora.net

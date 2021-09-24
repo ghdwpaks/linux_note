@@ -1,0 +1,17 @@
+man
+    -명령어 / 파일에 대한 자세한 설명(매뉴얼) 확인
+
+    -예시 :
+    man ls
+    man mkdir
+
+    -동작 후 추가 입력 키
+    enter       : 한 줄 아래가기
+    k           : 한 줄 위로가기
+    spacebar    : 한 화면 아래가기
+    page down   : 한 화면 아래가기
+    page up     : 한 화면 위로가기
+    g           : 처음으로 이동
+    G           : 마지막으로 이동
+    /pattern    : pattern(패턴) 검색(검색 후 n 눌러서 다음 찾기)
+    q           : man 종료

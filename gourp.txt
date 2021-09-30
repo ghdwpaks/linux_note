@@ -251,4 +251,32 @@ user&group
             - 사용 형식
                 id <사용자명>
 
+        문제 예시 :
+            아래 조건에 맞는 사용자 생성해보기
+            user    : testuser
+            UID     : 1200
+            GID     : tg
+            shell   : csh
+            home directory 생성 위치    : /hosting
+            skel    : /kgskel
+            자동생성 디렉토리           : public_html
+            자동생성 파일               : .kg
+
+            조건 1. 모든 작업은 기본정보(useradd -D, /etc/default/useradd)를 수정하지 않고 옵션만 사용
+            조건 2. 사용자 생성 후 다른 명령어를 사용하여 정보 수정 X (usermod 등등)
+
+            groupadd tg
+
+            cp -r /etc/skel /kgskel
+
+            touch /kgskel/.kg
+
+            mkdir /kgskel/public_html /hosting
+
+            useradd -u 1200 -g tg -s /bin/csh -d /hosting/testuser -mk /kgskel testuser
+
+            tail -1 /etc/passwd
+
+            id testuser
+
             

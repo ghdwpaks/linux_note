@@ -1,0 +1,14 @@
+http
+    - web server : client의 요청에 web page를 제공해주는 서버
+        > httpd- 로 시작하는 web server는 apache web server
+    
+    - 설치 및 사용 준비
+        yum -y install httpd-*                      : apache web server 설치
+        systemctl restart httpd                     : web server 동작
+        systemctl enable httpd                      : 부팅 시 web server 자동으로 동작
+        firewall-cmd --permanent --add-service=http : 방화벽 예외 규칙에 http 추가
+        firewall-cmd --reload                       : 방화벽 다시 실행
+
+    - 사용 방법
+        web browser에 web server의 IP를입력
+        

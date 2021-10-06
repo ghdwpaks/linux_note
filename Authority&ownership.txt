@@ -130,6 +130,77 @@ Authority and ownership
         chmod 623 hello.txt
         (*hello.txt 파일의 권한을 u = rw- , g = -w- , o = -wx 으로 설정한다.)
 
+소유권
+    - 파일/디렉토리를 어느 사용자와 그룹이 소유하고 있는지 나타내는 권한
+        > ls -l 명령으로 출력되는 정보 중 링크 개수 뒤에 나오는 사용자명과 그룹명이 소유권
+        (*
+        -rw-r--r-- 1 itbank itbank  6205496 10월  6 20:03 vim-common-7.4.629-7.el7.x86_64.rpm
+        -rw-r--r-- 1 itbank itbank  1105904 10월  6 20:03 vim-enhanced-7.4.629-7.el7.x86_64.rpm
+        -rw-r--r-- 1 itbank itbank    11144 10월  6 20:03 vim-filesystem-7.4.629-7.el7.x86_64.rpm
+        -rw-r--r-- 1 itbank itbank   453600 10월  6 19:18 vim-minimal-7.4.629-7.el7.x86_64.rpm
+
+        이러한 경우에는 사용자명과 그룹명이 itbank(사용자명)와 itbank(그룹명)으로 동일하다
+        )
+
+    - 소유권을 두 개의 영역으로 구분
+        > 앞에 나오는 정보가 계정명(UID), 파일/디렉토리를 소유하고 있는 사용자 뒤에 나오는 정보가 그룹명(GID), 파일/디렉토리를 소유하고 있는 그룹
+        (*
+        -rw-r--r-- 1 itbank itbank  6205496 10월  6 20:03 vim-common-7.4.629-7.el7.x86_64.rpm
+        itbank      itbank
+        (사용자명)  (그룹명)    )
+
+
+    - 소유권 변경
+        chown [옵션] 권한값 대상 [대상] ... [대상]
+
+        *권한값 작성 방식( : 기호 대신에 . 기호 사용 가능)
+        UID	> 소유권의 UID 지정
+        UID:GID	> 소유권의 UID, GID 지정
+        UID:	> 소유권의 UID, GID를 특정 사용자의 UID, GID로 변경
+        :GID	> 소유권의 GID 영역 변경
+
+        (*
+        chown itbank:itbank hello.txt
+        소유권의 UID와 GID를 itbank와 itbank로 지정한다.
+        -rw-r--r-- 1 itbank itbank       12 10월  7 03:02 hello.txt
+
+        chown root hello.txt
+        소유권의 UID와 root로 지정한다.
+        -rw-r--r-- 1 root itbank       12 10월  7 03:02 hello.txt
+        
+        
+        chown :root hello.txt
+        소유권의 GID와 itbank로 지정한다.
+        -rw-r--r-- 1 root root       12 10월  7 03:02 hello.txt
+
+
+        (*
+        실행전
+        drwxr-xr-x 2 root   root         52 10월  7 03:36 test
+        -rw-r--r--  1 root   root     33 10월  7 03:35 hello_test1.txt
+        -rw-r--r--  1 root   root     12 10월  7 03:36 hello_test2.txt
+        )
+        
+        chown -R itbank:itbank ./test
+        test디렉토리의 안에 들어있는 내용물과 그 하위 디렉토리 전부 소유권을 변경한다.  
+
+        (*
+        실행후
+        drwxr-xr-x 2 itbank itbank       52 10월  7 03:36 test
+        -rw-r--r--  1 root   root     33 10월  7 03:35 hello_test1.txt
+        -rw-r--r--  1 root   root     12 10월  7 03:36 hello_test2.txt
+        )
+
+        )
+
+    허가권과 소유권이 적용되는 방식(중요!!!)
+    1. 작업 주체와 작업 대상의 UID, GID 확인
+        > 작업 주체 : 작업을 수행하는(= 명령을 입력하는) 사용자	>> 사용자 정보 중 UID, GID(/etc/passwd 파일, id 명령)
+        작업 대상 : 작업(= 명령)의 대상이 되는 파일/디렉토리	>> 소유권 UID, GID(ls 명령어 -l 옵션이나 -n 옵션)
+
+    2. 작업 주체와 작업 대상의 UID, GID 비교
+        1) UID 비교 >> UID가 일치하면 owner 영역 권한 적용, 일치하지 않으면 GID 비교
+        2) GID 비교 >> GID가 일치하면 group 영역 권한 적용, 일치하지 않으면 other 영역 권한 적용
 
 
 

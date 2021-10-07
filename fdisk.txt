@@ -1,0 +1,93 @@
+(*
+Command (m for help): m
+Command action
+   a   toggle a bootable flag
+   b   edit bsd disklabel
+   c   toggle the dos compatibility flag
+   d   delete a partition
+   g   create a new empty GPT partition table
+   G   create an IRIX (SGI) partition table
+   l   list known partition types
+   m   print this menu
+   n   add a new partition
+   o   create a new empty DOS partition table
+   p   print the partition table
+   q   quit without saving changes
+   s   create a new empty Sun disklabel
+   t   change a partition's system id
+   u   change display/entry units
+   v   verify the partition table
+   w   write table to disk and exit
+   x   extra functionality (experts only)
+
+
+명령(도움말의 경우 m): m
+명령 작업
+    a 부팅 가능한 플래그 토글
+    b 편집 bsd 디스크 레이블
+    c 도스 호환성 플래그 토글
+    d 파티션 삭제
+    g 새로운 빈 GPT 파티션 테이블 생성
+    G IRIX(SGI) 파티션 테이블 생성
+    l 알려진 파티션 유형 나열
+    m 이 메뉴를 출력
+    n 새 파티션 추가
+    o 새로운 빈 DOS 파티션 테이블 생성
+    p 파티션 테이블 출력
+    q 변경 사항을 저장하지 않고 종료
+    s 새 빈 Sun 디스크 레이블을 만듭니다.
+    t 파티션의 시스템 ID를 변경
+    디스플레이 변경
+
+)
+
+
+fdisk
+    -Linux(에 기본적으로 탑차돼있는 장치 관리 프로그램)
+
+    -사용 방법  
+        fdisk <장치명>      : 해당 장치 관리
+        (*  내부 명령어(command)
+            d   : 파티션 삭제
+            n   : 파티션 생성
+            p   : 파티션 목록 확인
+            q   : 변경 내용을 저장하지 않고 종료
+            w   : 저장 후 종료
+        
+        )
+        
+
+        fdisk -l [장치명]   : 장치 인식 여부 확인
+            (*
+            예시 : fdisk -l /dev/sdb
+                /dev/sdb 장치를 인식하고 있는지 확인함.
+            출력 예시 : 
+                Disk /dev/sdb: 1073 MB, 1073741824 bytes, 2097152 sectors
+                Units = sectors of 1 * 512 = 512 bytes
+                Sector size (logical/physical): 512 bytes / 512 bytes
+                I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+            예시 : fdisk -l
+                현재 운영체제에서 인식하고 있는 장치들에 대한 정보를 출력함
+            출력 예시 :
+                Disk /dev/sda: 21.5 GB, 21474836480 bytes, 41943040 sectors
+                Units = sectors of 1 * 512 = 512 bytes
+                Sector size (logical/physical): 512 bytes / 512 bytes
+                I/O size (minimum/optimal): 512 bytes / 512 bytes
+                Disk label type: dos
+                Disk identifier: 0x000aaa69
+
+                Device Boot      Start         End      Blocks   Id  System
+                /dev/sda1   *        2048     2099199     1048576   83  Linux
+                /dev/sda2         2099200     6293503     2097152   82  Linux swap / Solaris
+                /dev/sda3         6293504    41943039    17824768   83  Linux
+
+                Disk /dev/sdb: 1073 MB, 1073741824 bytes, 2097152 sectors
+                Units = sectors of 1 * 512 = 512 bytes
+                Sector size (logical/physical): 512 bytes / 512 bytes
+                I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+            예시 : fdisk /dev/sdb
+                /dev/sdb 장치 관리를 시작함.
+            )
+        

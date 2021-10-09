@@ -1,0 +1,13 @@
+ln
+    - hard link 생성
+
+    - 사용 형식
+        ln [옵션] 원본 링크이름
+
+    * 옵션
+        -s	: hard link 대신에 symbolic link 생성
+        -f	: 기존 link 파일에 덮어쓰기
+        (이미 존재하는 link 파일로는 link 생성이 불가능해서 사용하는 옵션)
+
+    > hard link	: 원본 파일과 inode 값이 같은 파일 생성(= 같은 sector에 저장된 데이터로 연결하는 파일 생성)
+        symbolic link	: 원본 파일로 연결되는 link 파일(= windows의 바로가기 개념)

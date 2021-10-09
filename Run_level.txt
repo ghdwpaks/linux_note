@@ -1,0 +1,36 @@
+run-level
+    - 시스템 부팅 과정에서 동작하는 각종 프로세스들을 단계별로 구분해놓은 개념
+        런레벨에 따라 동작하는 프로세스들이 추가되는 방식으로 구성
+
+    - unix 기반의 운영체제는 부팅 시 어느 run-level 단계로 부팅을 할 것인지 설정
+        > 운영체제에 따라 런레벨이 다르기 때문에 미리 확인이 필요하다
+
+    - CentOS 7 버전으로 기준으로 런레벨 방식이 변경
+        ~ CentOS 6 : 부팅 시 initd 메인 프로세스가 동작 -> /etc/inittab 파일 내부 내용을 확인하여 부팅한 런레벨 결정
+    ( /etc/inittab 내부 id:숫자:initdefault: 설정의 숫자에 따라 런레벨 결정)
+
+    runlevel 0 : halt(시스템 종료)
+    runlevel 1 : single user mode(CLI, only root, 최소한의 service 동작, 백업/복구용 사용)
+    runlevel 2 : multi user mode without NFS(CLI, all user, GUI+network 관련 service 제외하고 동작)
+    runlevel 3 : full multi user mode(CLI, all user, GUI 관련 service 제외하고 동작)
+    runlevel 4 : unused
+    runlevel 5 : X11(GUI, all user, all service 동작)
+    runlevel 6 : reboot(시스템 재부팅)
+
+    CentOS 7 : 부팅 시 systemd 메이니 프로세스 동작 -> default.target 링크 파일에 연결된 런레벨로 부팅
+    ( /etc/systemd/system/default.target 링크파일이
+    /usr/lib/systemd/system/ 디렉토리 내부 런레벨 타겟에 연결되어 있다)
+
+    poweroff.target	  : runlevel 0
+    rescue.target	  : runlevel 1
+    multi-user.target : runlevel 3
+    graphical.target  : runlevel 5
+    reboot.target	  : runlevel 6
+
+    - 런레벨 확인
+        systemctl get-default
+        ls -l /etc/systemd/system/default.target
+
+    - 부팅 시 참조하는 런레벨 변경
+        systemctl set-default <런레벨 타겟>
+        ln -sf /usr/lib/systemd/system/<런레벨 타겟> /etc/systemd/system/default.target

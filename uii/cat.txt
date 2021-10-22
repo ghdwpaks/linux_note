@@ -1,0 +1,2 @@
+cat hello.txt
+cat > hello.txt

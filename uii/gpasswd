@@ -1,0 +1,2 @@
+gpasswd -a user12 test_group
+gpasswd -d user12 test_group

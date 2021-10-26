@@ -1,0 +1,4 @@
+chown itbank:itbank hello.txt
+
+chown root hello.txt
+chown :root hello.txt

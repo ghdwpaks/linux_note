@@ -1,0 +1,25 @@
+데몬 프로세스 제어
+
+-데몬 프로세스 : 서비스의 동작을 제어하는 프로세스
+    데몬 프로세스를 실행시켜서 서비스를 동작시킬 수 있고, 종료시켜서 서비스를 종료시킬 수 있다.
+-제어 멍령
+    systemctl {start | stop | restart | status | enable | disable } <데몬명>
+        start   : 실행
+        stop    : 정지
+        restart : 재실행(정지 -> 실행)
+        status  : 상태 확인
+        enable  : 부팅 시 데몬 프로세스 자동 실행
+        disable : enable 헤제
+
+예시 :
+    remote access - telnet
+    -초창기부터 사용되던 원격 접속 Protocol
+    -CLI  환경으로 사용됨
+    -거의 모든 OS에서 사용 가능하지만 보안성이 낮음(비 암호화 통신이므로 가급적 사용하지 않는다.)
+    -정보
+        패키지  : telnet-*
+        데몬    : telnet.socket
+        (기본적으로 데몬은 .service 확장자가 자동으로 붙지만 telnet은 CentOS 7 버전부터 통신 socket으로 취급함)
+
+        방화벽  : port=23/tcp, service=telnet
+        설정파일: 없음(service가 아니기때문에 설정 파일은 존재하지 않는다.)

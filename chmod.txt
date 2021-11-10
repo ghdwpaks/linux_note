@@ -1,0 +1,24 @@
+
+-허가권 변경
+    chmod [옵션] 권한값 대상 [대상] ... [대상]
+    
+    *권한값을 숫자/문자로 입력
+        숫자로 입력하면 numeric method
+        문자로 입력하면 symbolic method
+            > symbolic method에서 사용하는 영역 문자
+                u : owner
+                g : group
+                o : other
+        
+    예시 :
+    chomd o+wx hello.txt
+    (*hello.txt 파일의 o(other)권한의 w 와 x 추가)
+
+    chmod o-r hello.txt
+    (*hello.txt 파일의 o(other)권한의 r 제거)
+
+    chmod o+wx , o-r hello.txt
+    (*hello.txt 파일의 o(other)권한의 w 와 x 추가를 하고 r권한을 제거한다.)
+
+    chmod 623 hello.txt
+    (*hello.txt 파일의 권한을 u = rw- , g = -w- , o = -wx 으로 설정한다.)

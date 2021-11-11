@@ -1,0 +1,72 @@
+firewall(방화벽)
+ - 장치의 네트워크 통신의 보안성을 높이는 요소
+    > 장치간의 통신에서 무조건 고려해야 한다
+
+ - 방화벽은 inbound와 outbound로 분류
+    > inbound(장치에 들어오는) 트래픽은 기본적으로 모두 차단
+      outbound(장치에서 나가는) 트래픽은 모두 허용
+
+    > 방화벽에 예외 규칙을 추가하여 규칙에 부합하는 트래픽은 허용
+
+ - CentOS는 6 버전 까지는 iptables 방화벽을 사용하다가
+   7 버전 부터는 firewalld 방화벽을 사용
+
+ - firewalld 사용 방법
+  1. 예외 규칙 작성
+	firewall-cmd [--permanent] < add or remove target >
+
+		--permanent	: 모든 interface를 대상으로 방화벽 규칙 적용
+
+		add or remove target은 add는 규칙 추가, remove는 규칙 제거를 기본으로
+		port나 service 등을 기준으로 방화벽의 예외 규칙 제어
+		  ex>	add-port	: 예외 규칙에 port 추가
+			remove-port	: 예외 규칙에서 port 제거
+			add-service	: 예외 규칙에 service 추가
+			remove-serivce	: 예외 규칙에서 service 제거
+
+  2. 예외 규칙 적용
+	firewall-cmd --reload
+
+  3. 예외 규칙 확인
+	firewall-cmd --list-all
+
+다른 사용자 권한 획득 명령어
+ - sudo
+	특정 명령어를 입력할 때 다른 사용자(보통은 관리자)의 권한을 획득하여 명령을 동작
+	sudo 명령어를 사용하는 일반 사용자 계정의 정보를 수정하고 /etc/sudoers 파일을 편집하여 사용
+	권한을 획득한 terminal이 종료되면 획득한 권한 폐기
+
+ - su
+	현재 접속을 유지한 상태로 다른 사용자(보통은 관리자)로 추가 접속하여 사용
+	su 명령어만 입력하면 환경 변수 등의 개인 환경을 먼저 접속했던 사용자의 개인 환경으로 유지
+	su - 입력하면 개인 환경을 추가 접속하는 사용자의 환경으로 변경
+
+remote access - ssh
+
+ - secure shell; 보호된 shell
+
+ - 암호화 된 통신을 제공하는 protocol
+    > key 교환을 통해 암호화 key를 생성하고, 암호화 key를 이용하여 주고받는 데이터를 암호화/복호화
+
+ - CLI 환경의 원격 연결
+
+ - version 1과 version 2가 있으며 현재는 version 2를 사용
+
+ - Linux는 기본적으로 ssh가 설치되어 있고, 자동으로 동작하도록 되어있다
+
+ - 정보
+	패키지	: openssh-*
+	데몬	: sshd
+	방화벽	: port=22/tcp, service=ssh
+	설정파일	: /etc/ssh/sshd_config
+
+ - 접속 명령어
+	ssh <접속할 IP>
+		: 명령어를 입력한 사용자와 동일한 이름의 상대 컴퓨터의 계정으로 접속
+		  (사용자 계정 지정이 불가능)
+
+	ssh -l <계정명> <접속할 IP>
+		: 상대 컴퓨터에 해당 계정으로 접속
+
+	ssh <계정명>@<접속할 IP>
+		: 상대 컴퓨터에 해당 계정으로 접속

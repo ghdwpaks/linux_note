@@ -1,0 +1,86 @@
+firewall(방화벽)
+ - 장치의 네트워크 통신의 보안성을 높이는 요소
+    > 장치간의 통신에서 무조건 고려해야 한다
+
+ - 방화벽은 inbound와 outbound로 분류
+    > inbound(장치에 들어오는) 트래픽은 기본적으로 모두 차단
+      outbound(장치에서 나가는) 트래픽은 모두 허용
+
+    > 방화벽에 예외 규칙을 추가하여 규칙에 부합하는 트래픽은 허용
+
+ - CentOS는 6 버전 까지는 iptables 방화벽을 사용하다가
+   7 버전 부터는 firewalld 방화벽을 사용
+
+ - firewalld 사용 방법
+  1. 예외 규칙 작성
+	firewall-cmd [--permanent] < add or remove target >
+
+		--permanent	: 모든 interface를 대상으로 방화벽 규칙 적용
+
+		add or remove target은 add는 규칙 추가, remove는 규칙 제거를 기본으로
+		port나 service 등을 기준으로 방화벽의 예외 규칙 제어
+		  ex>	add-port	: 예외 규칙에 port 추가
+			remove-port	: 예외 규칙에서 port 제거
+			add-service	: 예외 규칙에 service 추가
+			remove-serivce	: 예외 규칙에서 service 제거
+
+  2. 예외 규칙 적용
+	firewall-cmd --reload
+
+  3. 예외 규칙 확인
+	firewall-cmd --list-all
+
+
+시나리오 예시 :
+문제 : telnet 으로 비 암호화 통신을 하기 위해서 예외 규칙에 포트를 넣어야 한다.
+정보 : telnet이 이용하는 well-known 포트는 tcp 프로토콜 23번 포트에 해당한다.
+해결 :
+
+firewall-cmd --list-all
+이 명령어를 통해서 이미 telnet이 예외처리 되어있는지 확인한다.
+
+
+[root@server ~]# firewall-cmd --list-all
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens32
+  sources:
+  services: dhcpv6-client ftp ssh
+  ports: 23/tcp
+  protocols:
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+
+위와 같은 결과가 나왔는데 'ports: 23/tcp'를 잘 보면 이미 tcp프로토콜의 23번 포트가 추가되어 있는것을 확인 할 수 있다.
+
+만약 여기서
+public (active)
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens32
+  sources:
+  services: dhcpv6-client ftp ssh
+  ports: 
+  protocols:
+  masquerade: no
+  forward-ports:
+  source-ports:
+  icmp-blocks:
+  rich rules:
+이러한 결과가 나왔다면
+23/tcp 같은 예외 처리 된 포트(port)가 없다는 뜻이므로 후처리를 해줘야한다.
+
+firewall-cmd --permanent --add-port=23/tcp
+firewall-cmd    : 방화벽 관련 명령어
+--permanent     : 모든 interfaces(인터페이스)를 대상으로 방화벽 규칙 적용 예정
+--add-port      : 예외 규칙에 port 추가
+=               : 추가할 포트는
+23/tcp          : tcp 프로토콜의 23번 포트(telnet의 well-known 포트)
+라는 의미의 명령어를 입력해준다.
+
+firewall-cmd --reload
+이 명령어를 통해서 다시 전체적인 네트워크 시스템을 재시작해준다.

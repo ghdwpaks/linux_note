@@ -1,0 +1,50 @@
+문제 내용 :
+root로 바로 접속하는것을 막아야합니다.
+root로 바로 접속하게 된다면 너무 높은 권한때문에 시스템에 예상치 못한
+문제를 초래할 수 있어보입니다.
+적어도 sudo 나 su root같은 명령어를 이용하여 최초 시도자가 누구인지라도 알아야합니다.
+
+
+문제 풀이 :
+
+vi /etc/ssh/sshd_config
+root로 접속하여 /etc/ssh/sshd_config 에 vi 로 접근합니다.
+-rw------- 1 root root 3906 11월 15 05:51 /etc/ssh/sshd_config
+기본적으로 위에서 나타나있듯이 root에게만 읽고, 쓰기 (실행이 없는 이유는 필요하지 않다)기능이 열려 있다.
+
+#PermitRootLogin yes 이 있는 부분으로 가서
+PermitRootLogin No
+로 바꾸고 저장하고 나간다.
+
+systemctl status sshd
+를 입력해서 sshd 서비스의 상태가 어떠한지 확인한다.
+(* 출력 예시 : 
+[root@server /]# systemctl status sshd
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: enabled)
+   Active: active (running) since 수 2021-11-17 20:34:23 KST; 8h ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+ Main PID: 1176 (sshd)
+    Tasks: 1
+   CGroup: /system.slice/sshd.service
+           └─1176 /usr/sbin/sshd -D
+
+11월 17 20:34:23 server systemd[1]: Starting OpenSSH server daemon...
+11월 17 20:34:23 server sshd[1176]: Server listening on 0.0.0.0 port 22.
+11월 17 20:34:23 server sshd[1176]: Server listening on :: port 22.
+11월 17 20:34:23 server systemd[1]: Started OpenSSH server daemon.
+11월 17 20:45:38 server sshd[1941]: Accepted password for root from 192.16...h2
+Hint: Some lines were ellipsized, use -l to show in full.
+)
+'Active: active (running)'라는 구문이 아마 초록색으로 나올텐데, 이러한 경우에는 이미 sshd데몬이 실행되고 있는중인것이다. 따라서
+
+systemctl restart sshd
+을 입력해서 sshd 서비스를 다시 시작한다.
+
+이후 다시 putty나 다른 단말기에서 다시 root 접속을 시도하면 막히게 된다.
+itbank같은 일반 사용자로 로그인 한 다음에 su - 나 su root 로 다시 로그인 해야한다.
+
+
+
+

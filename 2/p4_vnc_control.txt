@@ -1,0 +1,18 @@
+vncserver -list
+라고 입력하면
+(*
+[root@localhost itbank]# vncserver -list
+
+TigerVNC server sessions:
+
+X DISPLAY #     PROCESS ID
+:1              3651
+:50             4216
+)
+이렇게 나옵니다
+프로세스 아이디(PROCESS ID)는
+kill 3651같은 프로세스를 종료시키는 명령어에 사용됩니다.
+
+
+
+

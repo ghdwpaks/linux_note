@@ -1,0 +1,70 @@
+문제 내용 :
+vnc를 사용하고싶습니다.
+
+
+문제 해결:
+
+yum -y install tigervnc-*
+를 이용하여 tigervnc 를 다운받습니다.
+
+vncserver
+를 입력하면 다음과 같은 구문들이 나옵니다.
+(*
+[root@server /]# vncserver
+xauth:  file /root/.Xauthority does not exist
+
+New 'server:1 (root)' desktop is server:1
+
+Starting applications specified in /root/.vnc/xstartup
+Log file is /root/.vnc/server:1.log
+)
+이 중에서
+'New 'server:1 (root)' desktop is server:1' 구문에서
+'server:1' 이 구문의 뜻은, server 라는 이름의 단말기에서 세션번호가 '1'인 세션을 열었다는 뜻입니다.
+
+아니면 아래와 같은 구문들이 나올수도 있습니다.
+(*
+[root@localhost itbank]# vncserver
+
+You will require a password to access your desktops.
+
+Password:
+)
+이러한 구문은 세션의 패스워드를 결정하는 곳입니다.
+입력 한 후(안보이는 것이 정상입니다.)엔터를 치면 
+(*
+Verify:
+)
+이러한게 나오는데
+이건 비밀번호를 재입력하는 곳입니다.
+그리고 다시 입력한 후 엔터를 치면
+(*
+Would you like to enter a view-only password (y/n)? n
+A view-only password is not used
+xauth:  file /root/.Xauthority does not exist
+
+New 'localhost.localdomain:1 (itbank)' desktop is localhost.localdomain:1
+
+Creating default startup script /root/.vnc/xstartup
+Creating default config /root/.vnc/config
+Starting applications specified in /root/.vnc/xstartup
+Log file is /root/.vnc/localhost.localdomain:1.log
+)
+이러한 구문이 나오며, 세션이 완성됩니다.
+
+'localhost.localdomain:1' 이 구문을 들여다본다면 : 뒤에 1을 보면 세션 번호가 1임을 알 수있습니다.
+
+방식이 어쨌든, 과정이 어쨌든 이렇게 세션을 만들고
+세션 번호를 확인하는것이 가장 중요합니다.
+
+이러한 과정을 통해 vnc 세션을 열었습니다.
+
+vncserver
+가 아니라
+
+vncserver :50
+이라고 입력하면, 세션 번호가 50인 상태로 생성된다.
+
+
+
+

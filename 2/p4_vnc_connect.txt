@@ -1,0 +1,24 @@
+
+vncviewer <접속할 IP>:<session>
+기본적인 형식은 이렇습니다.
+
+바로 위에 password를 따로 지정해준 상황에서, 세션을 제공하는 컴퓨터의 아이피 주소가 192.168.127.129 이라고 하는 상황을 가정하겠습니다.
+
+vncviewer 192.168.127.129:1
+라고 입력한 뒤에 password를 요구하는 창이 나오면, 입력해줍니다.
+
+과정이 끝났습니다. 이 부분 이후에는 대표적인 디스플레이(display) 오류에 대해서 서술합니다.
+
+(*
+[root@localhost itbank]# vncviewer 192.168.127.129:1
+
+TigerVNC Viewer 64-bit v1.8.0
+Built on: 2020-11-16 16:46
+Copyright (C) 1999-2017 TigerVNC Team and many others (see README.txt)
+See http://www.tigervnc.org for information on TigerVNC.
+Can't open display:
+)
+이러한 구문이 발생하면서 그저 끝납니다.
+오류 구문은 대부분 'CLI only' 환경에서 발생합니다.
+대표적으로는 putty를 이용하는중에 오류가 발생합니다.
+이러한 경우에는 직접 vmware나 컴퓨터로 접속하여 GUI를 제공하는 환경에서 구동시켜야합니다.

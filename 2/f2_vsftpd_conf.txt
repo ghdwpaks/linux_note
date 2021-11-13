@@ -1,0 +1,234 @@
+이 문서는
+ftp에 관한 내용을 다루는
+/etc/vsftpd/vsftpd.conf 에 대해 서술합니다.
+
+12번행 즈음에 있는
+anonymous_enable = YES
+는, 알려지지 않은 사용자(어나니머스)의 출입을 허가하는지에 관한 내용입니다
+
+16번행 쯤에 있는
+local_enable=YES
+는, 로컬 사용자(root,itbank,ghdwpaks 등등의 알려지고, 등록된 사용자)의 출입을 허가하는지에 관한 내용입니다.
+
+19번행 쯤에 있는
+write_enable=YES 는
+로컬 사용자에게 뭔가 작성할 권한을 주는가에 대한 내용입니다.
+
+23번행 쯤에 있는
+local_umask=022 는
+생성되는 파일과 폴더의 허가권에 대한 내용입니다.
+
+29번
+anon_mkdir_write_enable=YES
+어나니머스(신원 미확인)유저가 폴더나 파일을 만드는것에 대한 권한을 설정합니다.
+
+33번 행 쯤에 있는
+#anon_mkdir_write_enable=YES
+어나니머스(신원 미확인)유저가 mkdir을 통해 폴더를 만들 수 있게 허락해주는지에 관한 내용입니다.
+
+43번 행에 있는
+connect_from_port_20=YES
+20번 포트를 사용할건지에 관한 내용입니다.(TCP의 ftp 포트)
+
+
+48번 행에 있는
+chown_uploads=YES
+위에 29번 행과 33번 행의 설정값들을 조정하여 익명 사용자가 업로드를 할 수 있게 해줬을 경우(익명 사용자는 소유권이 이상하게 기본설정 돼있기 때문에),익명사용자의 의도대로 소유권을 바꿔줄것인지에 관한 내용입니다. 
+
+49번 행에 있는
+chown_username=whoever
+48번 행에 있는 chown_uploads에 관한 설정을 끝마쳤으면 설정해주는 곳입니다. 직접적으로 사용할때는 주석처리 된 #과 whoever을 지워주고, whoever이 있는 자리에 '특정 사용자'를 적어넣습니다. 기본적인 소유권을 '특정 사용자'로 바꿔줍니다.
+
+60번 행에 있는
+idle_session_timeout=600
+세션 연결에 대한 유효기간입니다.
+
+63번 행에 있는
+data_connection_timeout=120
+데이터 전송 이후 120초 동안 세션을 연결한다는 뜻입니다.
+
+87번 행에 있는
+ftpd_banner=Welcome to blah FTP service.
+는 사용자들이 ftp 서버에 접속했을때 최초로 표시되는 안내문(배너)입니다.
+
+91번 행에 있는
+deny_email_enable=YES
+익명 사용자가 대부분 이메일을 입력하고 접속을 하는데, 특정 이메일 주소가 접속을 하는것을 차단하는것에 대한 스위치 설정입니다.
+
+93번 행에 있는
+banned_email_file=/etc/vsftpd/banned_emails
+위에 91번 행에서 설정한 값과 연결되어 있는데, 어떤 이메일을 차단할건지에 관한 목록을 기록한 파일의 경로를 나타냅니다.
+
+101번 행에 있는
+chroot_local_user=YES
+로컬 사용자 격리에 대한 스위치 문장입니다. YES라고 하면 격리를 하겠다는것이고, NO로 되어있거나 주석처리 되어있으면 하지 않는다는 의미입니다.
+
+102번 행에 있는
+chroot_list_enable=YES
+는 위의 chroot_local_user와 같은 값으로 설정해놓는게 좋습니다. 거의 비슷한 역할을 수행합니다.
+
+
+104번 행에 있는
+chroot_list_file=/etc/vsftpd/chroot_list
+는, 로컬 사용자들을 격리하는것에 대한 설정입니다.
+만약 /etc/vsftpd/chroot_list 같은 경로가 없거나, 로컬 사용자의 권한으로써 열어볼 수 없는 경우에는 접속 자체가 차단됩니다.
+어나니머스(익명 또는 알려지지 않은)사용자에 대한 별 다른 조치를 하지 않은 리눅스 서버에 들어가보면 기본적으로 최상위 디렉토리에 접근할 수 있는것처럼 보이게 됩니다.
+하지만 이것은 진짜로 최상위 디렉토리에 접근하는것이 아니라 /var/ftp/에 접속하는것이며(대부분은 여기에 pub이라는 디렉토리 하나만 존재합니다.)실질적으로는 최상위 디렉토리에 접근 할 수 있도록 설정되어있는것이 아닙니다.
+이렇게 익명 사용자의 활동 및 탐색범위에 대한 설정은 이들을 격리하는 역할을 하며, 이들이 시스템의 치명적이고 중요한 부분에 접근하지 못하도록 막습니다.
+이것을 로컬 사용자에게도 똑같이 적용시킵니다.
+(*500 OOPS: vftpd: refusing to run with writable root inside chroot() 같은 오류문이 나올경우 allow_writeable_chroot=YES 라는 구문을 밑줄에 추가하여 오류 재발을 방지해야합니다.)
+
+
+110번 행의
+ls_recurse_enable=YES
+ls 명령어의 recurse(-R)옵션을 사용할 수 있게 할것인지에 관한 내용입니다. 이게 중요한 이유는 ls의 R의 옵션이 '하위 디렉토리 및 파일까지 전부 출력한다'에 관한 내용인데, 만약 최상위 폴더에 접근이 가능할 경우 ls -lR / 같은 명령어를 통해 시스템의 전체적인 구조를 알 수 있게 돼버리기 때문에 통제해야하는 요소들 중에 등록됐습니다. 이외의 이유로써는 리눅스 서버의 연산력을 분포시켜 DDOS, DOS 공격을 방지하기 위함입니다.
+기본적으로는 주석처리로 막혀있으며, -R 옵션을 사용할 수 있게 해주려면 주석을 풀거나 NO로 되어있는것을 YES로 바꿔주면 됩니다.
+
+115번 행의
+listen=0
+데몬을 사용하는 종류는 크게 두가지가 있다.
+일반 데몬과 스탠드 얼론 데몬이다.
+일반 데몬은 기본적으로 슈퍼 데몬이라는 상위 데몬에 종속되어서 사용되는 데몬이다.
+스탠드 얼론 데몬은 반대로 종속되지 않는 데몬이다.
+이 listen은 이 ftp 데몬을 일반 데몬으로 사용할건지, 스탠드 얼론 데몬으로 사용할건지에 관한 스위치입니다. YES로 되어어있다면 스탠드 얼론으로 사용되고, NO로 되어있거나 주석처리가 되어있으면 다른 데몬에 종속되어 사용되는것을 뜻합니다. centOS 6버전 대에서는 네트워크 슈퍼데몬 XID라는것이 있어서 NO로 되어있으면 기본적으로 이것에 종속되어있었지만, CentOS 6에서는 YES로 표기되어 기본적으로 스탠드 얼론 데몬으로써 사용되었습니다. 다만
+CentOS 7 버전으로 올라오면서 Systemd가 메인 프로세스가 되면서 이 Systemd에 종속되어 사용됩니다. 하지만 IPv4의 보안상의 이유로써 NO로 되어있거나 주석처리가 되어있었으므로 이 아래의
+
+124번 행에서는
+listen_ipv6=YES
+IPv6를 통한 ftp데몬을 스탠드 얼론 데몬으로 사용함을 뜻합니다.
+
+
+(*
+
+[root@server /]# cat /etc/vsftpd/vsftpd.conf
+# Example config file /etc/vsftpd/vsftpd.conf
+#
+# The default compiled in settings are fairly paranoid. This sample file
+# loosens things up a bit, to make the ftp daemon more usable.
+# Please see vsftpd.conf.5 for all compiled in defaults.
+#
+# READ THIS: This example file is NOT an exhaustive list of vsftpd options.
+# Please read the vsftpd.conf.5 manual page to get a full idea of vsftpd's
+# capabilities.
+#
+# Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+anonymous_enable=YES
+#
+# Uncomment this to allow local users to log in.
+# When SELinux is enforcing check for SE bool ftp_home_dir
+local_enable=YES
+#
+# Uncomment this to enable any form of FTP write command.
+write_enable=YES
+#
+# Default umask for local users is 077. You may wish to change this to 022,
+# if your users expect that (022 is used by most other ftpd's)
+local_umask=022
+#
+# Uncomment this to allow the anonymous FTP user to upload files. This only
+# has an effect if the above global write enable is activated. Also, you will
+# obviously need to create a directory writable by the FTP user.
+# When SELinux is enforcing check for SE bool allow_ftpd_anon_write, allow_ftpd_full_access
+#anon_upload_enable=YES
+#
+# Uncomment this if you want the anonymous FTP user to be able to create
+# new directories.
+#anon_mkdir_write_enable=YES
+#
+# Activate directory messages - messages given to remote users when they
+# go into a certain directory.
+dirmessage_enable=YES
+#
+# Activate logging of uploads/downloads.
+xferlog_enable=YES
+#
+# Make sure PORT transfer connections originate from port 20 (ftp-data).
+connect_from_port_20=YES
+#
+# If you want, you can arrange for uploaded anonymous files to be owned by
+# a different user. Note! Using "root" for uploaded files is not
+# recommended!
+#chown_uploads=YES
+#chown_username=whoever
+#
+# You may override where the log file goes if you like. The default is shown
+# below.
+#xferlog_file=/var/log/xferlog
+#
+# If you want, you can have your log file in standard ftpd xferlog format.
+# Note that the default log file location is /var/log/xferlog in this case.
+xferlog_std_format=YES
+#
+# You may change the default value for timing out an idle session.
+#idle_session_timeout=600
+#
+# You may change the default value for timing out a data connection.
+#data_connection_timeout=120
+#
+# It is recommended that you define on your system a unique user which the
+# ftp server can use as a totally isolated and unprivileged user.
+#nopriv_user=ftpsecure
+#
+# Enable this and the server will recognise asynchronous ABOR requests. Not
+# recommended for security (the code is non-trivial). Not enabling it,
+# however, may confuse older FTP clients.
+#async_abor_enable=YES
+#
+# By default the server will pretend to allow ASCII mode but in fact ignore
+# the request. Turn on the below options to have the server actually do ASCII
+# mangling on files when in ASCII mode. The vsftpd.conf(5) man page explains
+# the behaviour when these options are disabled.
+# Beware that on some FTP servers, ASCII support allows a denial of service
+# attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
+# predicted this attack and has always been safe, reporting the size of the
+# raw file.
+# ASCII mangling is a horrible feature of the protocol.
+#ascii_upload_enable=YES
+#ascii_download_enable=YES
+#
+# You may fully customise the login banner string:
+#ftpd_banner=Welcome to blah FTP service.
+#
+# You may specify a file of disallowed anonymous e-mail addresses. Apparently
+# useful for combatting certain DoS attacks.
+#deny_email_enable=YES
+# (default follows)
+#banned_email_file=/etc/vsftpd/banned_emails
+#
+# You may specify an explicit list of local users to chroot() to their home
+# directory. If chroot_local_user is YES, then this list becomes a list of
+# users to NOT chroot().
+# (Warning! chroot'ing can be very dangerous. If using chroot, make sure that
+# the user does not have write access to the top level directory within the
+# chroot)
+chroot_local_user=YES
+chroot_list_enable=YES
+# (default follows)
+chroot_list_file=/etc/vsftpd/chroot_list
+allow_writeable_chroot=YES
+#
+# You may activate the "-R" option to the builtin ls. This is disabled by
+# default to avoid remote users being able to cause excessive I/O on large
+# sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
+# the presence of the "-R" option, so there is a strong case for enabling it.
+#ls_recurse_enable=YES
+#
+# When "listen" directive is enabled, vsftpd runs in standalone mode and
+# listens on IPv4 sockets. This directive cannot be used in conjunction
+# with the listen_ipv6 directive.
+listen=NO
+#
+# This directive enables listening on IPv6 sockets. By default, listening
+# on the IPv6 "any" address (::) will accept connections from both IPv6
+# and IPv4 clients. It is not necessary to listen on *both* IPv4 and IPv6
+# sockets. If you want that (perhaps because you want to listen on specific
+# addresses) then you must run two copies of vsftpd with two configuration
+# files.
+# Make sure, that one of the listen options is commented !!
+listen_ipv6=YES
+
+pam_service_name=vsftpd
+userlist_enable=YES
+tcp_wrappers=YES
+
+)

@@ -1,0 +1,65 @@
+ping
+내 장치와 목적지 장치 간의 네트워크 통신 상태 확인
+기본적으로 무한정 지속됨
+
+형식 : ping [옵션] <목적지 IP>
+
+*옵션
+-c  : 횟수 지정
+-i   : ping 트래픽 사이에 간격 지정(DOS 공격을 방지하기 위해서 0.5초 아래의 짧은 간격은 관리자만 사용이 가능하다.)
+-s   : 트래픽에 더미값을 추가하여 크기를 지정한다.
+
+예시 모음 :
+ping 192.168.127.128
+ping -c 5 192.168.127.128
+ping -c 5 -i 0.1 192.168.127.128
+
+
+
+
+예시 : ping 192.168.127.128
+결과 :
+[root@server ~]# ping 192.168.127.128
+PING 192.168.127.128 (192.168.127.128) 56(84) bytes of data.
+64 bytes from 192.168.127.128: icmp_seq=1 ttl=64 time=0.023 ms
+64 bytes from 192.168.127.128: icmp_seq=2 ttl=64 time=0.037 ms
+64 bytes from 192.168.127.128: icmp_seq=3 ttl=64 time=0.036 ms
+64 bytes from 192.168.127.128: icmp_seq=4 ttl=64 time=0.049 ms
+64 bytes from 192.168.127.128: icmp_seq=5 ttl=64 time=0.038 ms
+64 bytes from 192.168.127.128: icmp_seq=6 ttl=64 time=0.036 ms
+^C
+--- 192.168.127.128 ping statistics ---
+6 packets transmitted, 6 received, 0% packet loss, time 5009ms
+rtt min/avg/max/mdev = 0.023/0.036/0.049/0.009 ms
+[root@server ~]#
+
+
+예시 : ping -c 5 192.168.127.128
+결과 :
+[root@server ~]# ping -c 5 192.168.127.128
+PING 192.168.127.128 (192.168.127.128) 56(84) bytes of data.
+64 bytes from 192.168.127.128: icmp_seq=1 ttl=64 time=0.024 ms
+64 bytes from 192.168.127.128: icmp_seq=2 ttl=64 time=0.046 ms
+64 bytes from 192.168.127.128: icmp_seq=3 ttl=64 time=0.089 ms
+64 bytes from 192.168.127.128: icmp_seq=4 ttl=64 time=0.055 ms
+64 bytes from 192.168.127.128: icmp_seq=5 ttl=64 time=0.054 ms
+
+--- 192.168.127.128 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4027ms
+rtt min/avg/max/mdev = 0.024/0.053/0.089/0.022 ms
+
+
+예시 : ping -c 5 -i 0.1 192.168.127.128
+결과 : 
+PING 192.168.127.128 (192.168.127.128) 56(84) bytes of data.
+64 bytes from 192.168.127.128: icmp_seq=1 ttl=64 time=0.024 ms
+64 bytes from 192.168.127.128: icmp_seq=2 ttl=64 time=0.036 ms
+64 bytes from 192.168.127.128: icmp_seq=3 ttl=64 time=0.044 ms
+64 bytes from 192.168.127.128: icmp_seq=4 ttl=64 time=0.037 ms
+64 bytes from 192.168.127.128: icmp_seq=5 ttl=64 time=0.037 ms
+
+--- 192.168.127.128 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 422ms
+rtt min/avg/max/mdev = 0.024/0.035/0.044/0.009 ms
+
+

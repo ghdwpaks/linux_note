@@ -1,0 +1,189 @@
+가상 머신을 두개 준비한다.
+1900_server : 192.168.127.128
+1900_client : 192.168.127.129
+
+가상 머신 두 개에서 존재하는 
+/etc/ssh/sshd_config 라는 파일 안에 있는 PermitRootLogin 속성에 관한 값을 no로 설정한다.
+(*
+[root@server home]# cat /etc/ssh/sshd_config
+#       $OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/usr/bin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+# If you want to change the port on a SELinux system, you have to tell
+# SELinux about this change.
+# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+#
+#Port 22
+#AddressFamily any
+#ListenAddress 0.0.0.0
+#ListenAddress ::
+
+HostKey /etc/ssh/ssh_host_rsa_key
+#HostKey /etc/ssh/ssh_host_dsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# Ciphers and keying
+#RekeyLimit default none
+
+# Logging
+#SyslogFacility AUTH
+SyslogFacility AUTHPRIV
+#LogLevel INFO
+
+# Authentication:
+
+#LoginGraceTime 2m
+PermitRootLogin no
+#StrictModes yes
+#MaxAuthTries 6
+#MaxSessions 10
+
+#PubkeyAuthentication yes
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile      .ssh/authorized_keys
+
+#AuthorizedPrincipalsFile none
+
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+# For this to work you will also need host keys in /etc/ssh/ssh_known_hosts
+#HostbasedAuthentication no
+# Change to yes if you don't trust ~/.ssh/known_hosts for
+# HostbasedAuthentication
+#IgnoreUserKnownHosts no
+# Don't read the user's ~/.rhosts and ~/.shosts files
+#IgnoreRhosts yes
+
+# To disable tunneled clear text passwords, change to no here!
+#PasswordAuthentication yes
+#PermitEmptyPasswords no
+PasswordAuthentication yes
+
+# Change to no to disable s/key passwords
+#ChallengeResponseAuthentication yes
+ChallengeResponseAuthentication no
+
+# Kerberos options
+#KerberosAuthentication no
+#KerberosOrLocalPasswd yes
+#KerberosTicketCleanup yes
+#KerberosGetAFSToken no
+#KerberosUseKuserok yes
+
+# GSSAPI options
+GSSAPIAuthentication yes
+GSSAPICleanupCredentials no
+#GSSAPIStrictAcceptorCheck yes
+#GSSAPIKeyExchange no
+#GSSAPIEnablek5users no
+
+# Set this to 'yes' to enable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+# WARNING: 'UsePAM no' is not supported in Red Hat Enterprise Linux and may cause several
+# problems.
+UsePAM yes
+
+#AllowAgentForwarding yes
+#AllowTcpForwarding yes
+#GatewayPorts no
+X11Forwarding yes
+#X11DisplayOffset 10
+#X11UseLocalhost yes
+#PermitTTY yes
+#PrintMotd yes
+#PrintLastLog yes
+#TCPKeepAlive yes
+#UseLogin no
+#UsePrivilegeSeparation sandbox
+#PermitUserEnvironment no
+#Compression delayed
+#ClientAliveInterval 0
+#ClientAliveCountMax 3
+#ShowPatchLevel no
+#UseDNS yes
+#PidFile /var/run/sshd.pid
+#MaxStartups 10:30:100
+#PermitTunnel no
+#ChrootDirectory none
+#VersionAddendum none
+
+# no default banner path
+#Banner none
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+
+# override default of no subsystems
+Subsystem       sftp    /usr/libexec/openssh/sftp-server
+
+# Example of overriding settings on a per-user basis
+#Match User anoncvs
+#       X11Forwarding no
+#       AllowTcpForwarding no
+#       PermitTTY no
+#       ForceCommand cvs server
+)
+이 문서 43행 즈음에 'PermitRootLogin no'라는 구문처럼
+#을 없애고, 뒤에 있는 yes (또는 no)를 no로 입력해준다.
+
+이렇게 가상머신 두 개 전부 PermitRootLogin 값은 no 로 설정해준다.
+
+
+server : 192.168.127.128, /tmp 속에 A라는 파일 생성
+client : 192.168.127.129, /test 디렉터리 생성
+
+scp 예문 두개 다 설행하기.
+(단, 하나 완료 후 반드시 /test/A 삭제 할 것)
+
+정답 :
+scp itbank@192.168.127.128:/tmp/A /test
+를 client 측에서 입력한다. 구문을 해석하자면 아래와 같다.
+
+scp itbank@192.168.127.128:/tmp/A /test
+scp             : rcp 기반의 ssh 통신 예정
+itbank          : 'itbank'라는 이름의 계정으로 접속 예정
+@               : 구분자
+192.168.127.128 : '192.168.127.128'에 연결
+:               : 구분자
+/tmp/A          : 내 컴퓨터(client)에서 있는 /tmp/ 디렉토리 안에 있는 A 파일을
+/test           : 상대 컴퓨터(server) 에 있는 /test 라는 곳에 복사(붙혀넣기)한다.
+
+그리고
+
+scp /tmp/A itbank@192.168.127.129:/test
+라는 명령어를 server 측에서 입력한다. 구문을 해석하자면 아래와 같다
+scp             : rcp 기반의 ssh 통신 예정
+/tmp/A          : 내 컴퓨터(server)에서 있는 /tmp/ 디렉토리 안에 있는 A 파일을
+itbank          : 'itbank'라는 이름의 계정으로 접속 예정
+@               : 구분자
+192.168.127.129 : '192.168.127.129'에 연결
+:               : 구분자
+/test           : 상대 컴퓨터(client) 에 있는 /test 라는 곳에 복사(붙혀넣기)한다.
+
+
+scp 
+
+

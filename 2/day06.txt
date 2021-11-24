@@ -1,0 +1,17 @@
+FTP
+ - File Transfer Protocol; 파일 전송 프로토콜
+
+ - client가 FTP server에 접속하여 자신의 파일을 server에 넘겨주거나(upload)
+   server에 있는 파일을 내 컴퓨터로 전송(download)
+
+ - ftp 프로그램도 여러가지가 있으며 수업에서는 vsftpd 사용
+
+ - ftp server는 두 가지로 분류
+	로컬 ftp server	: ftp server가 설치된 OS의 사용자 계정들이 접속하는 ftp
+	익명 ftp server	: 누구나 접근 가능한 ftp
+
+ - 정보
+	패키지	: vsftpd-*
+	데몬	: vsftpd
+	방화벽	: service=ftp, port=20,21,random/tcp	* 가급적 예외 규칙을 port로 작성하지 않는다
+	설정파일	: /etc/vsftpd/vsftpd.conf

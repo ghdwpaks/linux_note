@@ -1,0 +1,13 @@
+-gpasswd
+        -그룹에 소속된 일반 사용자 목록을 제어
+
+        -사용 형식
+            gpasswd 옵션 사용자명 그룹명
+
+        -옵션들 :
+            a : 그룹에 사용자를 일반 소속 
+            d : 그룹의 일반 사용자 목록에서 특정 사용자 제거
+
+        -예시 :
+            gpasswd -a user12 test_group (*user12를 test_group에 소속시킴)
+            gpasswd -d user12 test_group (*user12를 test_group에 소속제외시킴)

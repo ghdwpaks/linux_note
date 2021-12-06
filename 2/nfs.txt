@@ -1,0 +1,10 @@
+NFS
+    -Network FileSyste; 네트워크를 통해 다른 장치의 파티션을 마운트함
+    -최초에는 Unix 중에 하나가 사용하던 서비스(service)
+        >유용성이 굉장히 높아서 다른 OS에서도 사용하기 시작함
+    -정보
+        패키지  : nfs-* (CentOS 7 이상부터는 단일 패키지로 구성됨)
+        데몬    : nfs
+        방화벽  : service=nfs
+        설정파일: /etc/exprots
+        

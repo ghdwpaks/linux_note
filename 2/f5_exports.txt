@@ -5,6 +5,8 @@
 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=hanajava&logNo=220422771247
 와
 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=musalyh&logNo=220710277058
+와
+https://fliedcat.tistory.com/174
 으로부터 발췌하여 작성했습니다.
 
 해당 exports 문서는 nfs에서 다루는 파티션 공유에 대한 내용이 기술되어 있어야만 하는 파일입니다.
@@ -13,19 +15,20 @@ https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=musalyh&logN
 /nfs    192.168.10.129(rw,no_root_squash,sync)
 입력되어 있다면 뜻은 아래와 같습니다 .
 
-/nfs    : 제공자 측에서 제공해줄 파티션이 마운트된 파일 위치
-192.168.10.129 : 사용자 측의 아이피
-rw      : 작업 형식. 일고, 쓰는것 모두를 허용한다는 내용이다.
-no_root_squash : client의 root를 서버의 root로 매핑 (최상위 관리자 접속으로 시도하는 경우, 상대방의 최상위 관리자의 이름이 어떻게 되든지간에 '최상위 관리자'라는 것에 맞춰 연결해줌)
-sync    : 파일 시스템이 변경되면 즉시 동기화
+/nfs            : 제공자 측에서 제공해줄 파티션이 마운트된 파일 위치
+192.168.10.129  : 사용자 측의 아이피
+rw              : 작업 형식. 일고, 쓰는것 모두를 허용한다는 내용이다.
+no_root_squash  : client의 root를 서버의 root로 매핑 (최상위 관리자 접속으로 시도하는 경우, 상대방의 최상위 관리자의 이름이 어떻게 되든지간에 '최상위 관리자'라는 것에 맞춰 연결해줌)
+sync            : 파일 시스템이 변경되면 즉시 동기화
 
 
 이외에도 괄호 안에 담기는것들에 관해서는 다음과 같은 내용또한 있습니다.
 ro          : read only
 rw          : read and write
-root_squash : client의 root를 서버의 nobody로 매핑
-no_root_squash : client의 root를 서버의 root로 매핑
-all_squash  : root를 제외하고 서버와 클라이언트 사용자를 동일한 권한으로 설정함.
+root_squash : client의 root를 서버의 nobody로 매핑 (상대방이 나에게 접속할때 root 로써 접근하게 되면 최상위 관리자 root로는 받지 않는다는 내용. 일반 사용자인 root로써 접근하게 됨)
+no_root_squash : client의 root를 서버의 root로 매핑 (상대방이 나에게 접속할때 root 로써 접근하게 되면 내 root권한에 맞춰 root의 사용권을 넘김)
+all_squash  : root를 제외하고 서버와 클라이언트 사용자를 동일한 권한으로 설정함. (* 모든 uid, gid를 익명사용자에게 매핑합니다. 디폴트 값입니다.)
+no_all_squash : no_root_squash 와 동일, 디폴트 값이다.
 insecure    : 인증되지 않은 접근이 가능함.
 noaccess    : 지정된 디렉토리는 접근을 금지함
 secure      : client 마운트 요청시 포트를 1024 이하로 설정함. 이는 well known 포트만을 사용하기 위함임.

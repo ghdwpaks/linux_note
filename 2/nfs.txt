@@ -8,3 +8,7 @@ NFS
         방화벽  : service=nfs
         설정파일: /etc/exprots
         
+    -설치 방법
+        rpm -qa | grep nfs
+        또는
+        yum install nfs-utils

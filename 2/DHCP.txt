@@ -1,0 +1,23 @@
+DHCP
+    - Dynamic Host Configuration Protocol
+        > 자동으로 host에게 IP 주소를 할당하는 서비스
+    
+    - 동작 순서(사용되는 패킷 종류) >> DORA 패킷을 주고 받아 IP 할당함 
+        * client에 IP 가 없는 상태로 진행
+            Discover    : client -> broadcast, 네트워크에서 DHCP 서버를 찾는 패킷
+            Offer       : server -> broadcast, discover 패킷을 받은 server가 전송하는 패킷('어떤 ip 를 줄수 있는가에 대한 패킷) 해당 ip를 자신의 내부(DHCP database)에서 임시 할당 상태로 분류
+            Request     : client -> broadcast, 제일 먼저 받은 offer를 '사용하겠다'라고 알려주는 패킷
+            Ack         : server -> broadcast, offer가 채용된 server에서 IP 정도 및 옵션들을 알려주는 패킷 (offer가 채용되지 못한 server는 임시 할당 상태인 IP를 다시 미할당으로 분류
+
+            이 후에 ack 패킷을 받은 client는 IP 정보와 각종 옵션들을 자신의 IP 설정에 적용
+    - client 가 할당받은 IP는 영구적용되지 않는다
+        > 따라서 임대 기간이 존재하고, 기간 만료 전 갱신 작업을 위하여 기존 IP를 계속 사용한다
+    - 정보
+        패키지  : dhcp-*
+        데몬    : dhcpd
+        방화벽  : service=dhcp
+        설정파일: /etc/dhcp/dhcpd.conf
+    
+
+
+

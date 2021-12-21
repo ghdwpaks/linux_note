@@ -1,0 +1,18 @@
+*virtual network editer 에 있는 VMnet 8의 DHCP가 켜져있다면 끄고 진행 필요
+1.  범위    : 192.168.X.0/24
+    할당 IP : 51~60
+    GW      : 192.168.X.2
+    DNS     : 192.168.X.2
+    최소임대기간 : 3일
+    최대임대기간 : 6일
+
+    위의 설정을 갖고있는 dhcp서버를 재부팅 후에도 동작 가능하도록 설정
+    client에서 IP 할당 받아보기
+    (1번이 완료된 후 virtual network editer에서 VMnet 8의 DHCP를 켜주세요)
+
+2. windows에서 client의 공유폴더 접근하여 메모장파일 만들어보기 (단, 접속은 testuser로 진행함)
+
+
+
+
+

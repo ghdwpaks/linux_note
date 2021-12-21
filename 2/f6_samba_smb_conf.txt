@@ -77,12 +77,22 @@ https://blog.naver.com/ncloud24/221499582757
         guest ok = Yes
 
 
+[UserShare]
+        comment = for local user
+        path = /samba/itbank
+        read only = No
+        writeable = Yes
+        valid users = @itbank
+
+
 구문을 중심으로 확인해보겠습니다.
 
 [global]    : 전체적으로 적용되는 사항
 workgroup   : 
 map to guest: 익명 사용자의 대우
 guest ok    : 익명 사용자의 접근 가능 여부
+read only   : 오직 읽기만 가능(쓰기 불가능)하게 설정할것인지
+valid users : 연결할 사용자 여부
 
 이외의 속성으로는 다음과같은것들이 있습니다.
 

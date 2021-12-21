@@ -1,0 +1,93 @@
+이 문서는
+공유 폴더 제공 서비스(samba)에 관한 내용을 다루는
+/etc/samba/smb.conf 에 대해 서술합니다.
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+https://blog.naver.com/ncloud24/221499582757
+으로부터 발췌했습니다.
+
+(*
+
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+
+[global]
+        workgroup = WORKGROUP
+        security = user
+        map to guest = bad user
+
+        passdb backend = tdbsam
+
+        printing = cups
+        printcap name = cups
+        load printers = yes
+        cups options = raw
+
+[homes]
+        comment = Home Directories
+        valid users = %S, %D%w%S
+        browseable = No
+        read only = No
+        inherit acls = Yes
+
+[printers]
+        comment = All Printers
+        path = /var/tmp
+        printable = Yes
+        create mask = 0600
+        browseable = No
+
+[print$]
+        comment = Printer Drivers
+        path = /var/lib/samba/drivers
+        write list = @printadmin root
+        force group = @printadmin
+        create mask = 0664
+        directory mask = 0775
+
+)
+
+이번 정보분석에서는 
+
+[global]
+        workgroup = WORKGROUP
+        security = user
+        map to guest = bad user
+
+        passdb backend = tdbsam
+
+        printing = cups
+        printcap name = cups
+        load printers = yes
+        cups options = raw
+
+
+[AnonShare]
+        comment = for anonymous
+        path = /samba/anon
+        guest ok = Yes
+
+
+구문을 중심으로 확인해보겠습니다.
+
+[global]    : 전체적으로 적용되는 사항
+workgroup   : 
+map to guest: 익명 사용자의 대우
+guest ok    : 익명 사용자의 접근 가능 여부
+
+이외의 속성으로는 다음과같은것들이 있습니다.
+
+comment     = share #코멘트
+path        = /home #공유 디렉토리의 경로
+public      = no #guest 접속 허용 여부를 확인합니다.
+writable    = yes # 쓰기 여부를 확인합니다.
+printable   = no # 프린터 사용 여부를 확인합니다. 
+write list  = root # 접속할 계정을 선택합니다. 여러개인 경우 띄어쓰기로 구분합니다.
+create mask = 0777 # 생성 권한을 선택합니다.
+directory mask  = 0777 # 디렉토리 권한을 선택합니다.
+
+
+
+
+

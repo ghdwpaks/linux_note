@@ -3,8 +3,14 @@
 /etc/hosts 에 대해 서술합니다.
 파일 내용 예시에 대한 내용은 아래와 같습니다.
 
+127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
 
-
+'
+192.168.127.128     www.naver.com
+www.naver.com 이 입력되면
+192.168.127.128 으로 연결한다는 내용이다.
+'
 
 127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
@@ -27,6 +33,10 @@ IPv4의 루프 벡에서 사용되는 주소
 ::1 
 IPv6의 루프 벡에서 사용되는 주소
 
+
+이 아래에는 실질적인 사용이 아닌, 이 hosts 파일에 대한 의미가 담겨있습니다.
+기본적으로 리눅스를 사용하는 한 pc의 이 hosts 파일이 변조된다면 굉장히 위험한 이유는 링크를 타던, 직접입력을 하던, FQDN 가 쓰인다면 모든 상황에서 적용을 받게 됩니다.
+'의도치 않은 사이트에 접속한다.'라는 상황으로 인해 벌어질수 있는 수많은 상황에 대한 서술은 하지 않겠습니다.
 
 
 

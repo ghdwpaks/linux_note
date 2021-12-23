@@ -27,4 +27,11 @@ Linux에 기본적으로 존재하는 DNS 관련 파일
     1. /etc/hosts
         IP주소  문자주소 
         컴퓨터에 문자주소가 입력된면 hosts 파일에서 매핑되어 있는 IP 주소로 연결 
-        
+
+    2. /etc/resolv.conf
+        nameserver <DNS IP>
+        network 데몬이 설정될 때 마다 IP 설정 중 DNS 주소 정보가 기록됨
+            > 해당 컴퓨터에서 DNS 서버를 찾아갈 때 resolv.conf 에 적힌 주소로 찾아감
+        *DNS 주소 예시
+            168.126.63.1    : KT DNS
+            8.8.8.8         : Google DNS

@@ -1,0 +1,30 @@
+DNS server 의 역할
+    1. IP address 와 FQDN 을 상호 변환
+        ex. 사용자가 client 에 FQDN 을 입력하면
+            1) client 장치는 자신의 cache 확인(hosts 파일 확인 -> DNS cache 확인)
+            2) IP 설정 중 DNS IP 를 확인하여 해당 DNS server 에 FQDN 을 질의
+            3) DNS server 는 자신의 zone 영역 확인 -> cache 확인(zone 영역 : nameserver 구성에 관련된 영역)
+            4) root hint 를 확인하여 root domain 에 FQDN을 질의 
+                -> root domain 은 FQDN 을 확인하여 top-level domain 의 IP 를 돌려준다 
+            5) top-level domain 에 FQDN 을 질의
+                -> top-level domain 은 FQDN 을 확인하여 second-level domain 의 IP를 돌려준다
+            6) second-level domain 에 FQDN 을 질의
+                -> second-level domain 은 FQDN 을 확인하여 host name 을 갖고 있는지 확인하고 FQDN 에 매핑된 IP 를 돌려준다
+            7) DNS server 는 4 ~ 6 과정에서 알아낸 서버들의 IP 를 자신의 cache 에 저장
+            8) client 에게 FQDN 에 대한 IP 를 전송
+            9) client 는 자신의 cache 에 해당 IP 를 저장 -> 알게된 IP 로 연결 시도
+        * 위의 과정에서 3 ~ 8 과정이 DNS server 의 일반적인 동작
+
+        * root hint 를
+            a ~ m 까지의 모든 root domain 의 IP 주소를 갖고있는 파일
+
+    2. nameserver 구성
+        DNS server 를 설치하면 nameserver 를 구성할 수 있는(= zone 영역을 만들 수 있는 )파일이 함께 설치된다.
+            > zone 영역을 구성하여 DNS server 를 nameserver 로 사용할 수 있다
+        root domain, top-level domain, second-level domain 등은 각각이 하나의 nameserver
+
+Linux에 기본적으로 존재하는 DNS 관련 파일
+    1. /etc/hosts
+        IP주소  문자주소 
+        컴퓨터에 문자주소가 입력된면 hosts 파일에서 매핑되어 있는 IP 주소로 연결 
+        

@@ -1,0 +1,32 @@
+이 문서는
+도메인 평문 제공 서비스(DNS)에 관한 내용을 다루는
+/etc/hosts 에 대해 서술합니다.
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+
+
+
+127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1 localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+
+같은 구문이 적혀있을겁니다.
+
+지금 위와 같은 구문의 대부분의 의미는 루프 백(Loop back) 주소 입니다.
+127.0.0.1 이나 localhost 같은 의미이고, 대부분 그렇게 적혀있는것을 알 수 있습니다.
+루프 백 아이피 : 내가 어떤 아이피를 쓰고있던간에, 내 자신을 찾아갈 수 있게 해줌
+
+띄어쓰기로 구분된 단어 하나하나가 전부 다 각각의 문자주소(FQDN)가 된다.
+그 FQDN에 대한 아이피 주소가 루프 벡 주소가 된다는 내용이다.
+
+우리가 컴퓨터에다가 localhost 문자를 입력했을때, 나 자신을 찾아갈 수 있는 이유가 저 loop back 주소(IP)가 매핑이 되었기 때문이다
+
+127.0.0.1
+IPv4의 루프 벡에서 사용되는 주소
+
+::1 
+IPv6의 루프 벡에서 사용되는 주소
+
+
+
+

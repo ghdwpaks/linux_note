@@ -1,4 +1,7 @@
 DHCP
+    설치
+        yum -y install dhcp-*
+
     - Dynamic Host Configuration Protocol
         > 자동으로 host에게 IP 주소를 할당하는 서비스
     

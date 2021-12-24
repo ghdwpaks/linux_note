@@ -1,0 +1,77 @@
+이 문서는
+아이피 동적 할당을 뜻하는 DHCP(Dynamic Host Configuration Protocol)에 대한
+현재 할당되어있는 아이피 정보를 담고있는 
+/var/lib/dhcpd/dhcpd.leases 에 대해 서술합니다.
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+(*
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-4.2.5
+
+server-duid "\000\001\000\001)Y\007z\000\014)\335\306\344";
+
+lease 192.168.127.201 {
+  starts 5 2021/12/24 22:45:10;
+  ends 2 2021/12/28 22:45:10;
+  cltt 5 2021/12/24 22:45:10;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 00:50:56:c0:00:08;
+  uid "\001\000PV\300\000\010";
+  client-hostname "DESKTOP-HCB8KMM";
+}
+lease 192.168.127.202 {
+  starts 5 2021/12/24 22:50:14;
+  ends 2 2021/12/28 22:50:14;
+  cltt 5 2021/12/24 22:50:14;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 00:0c:29:a6:38:e5;
+}
+lease 192.168.127.202 {
+  starts 5 2021/12/24 22:50:27;
+  ends 2 2021/12/28 22:50:27;
+  cltt 5 2021/12/24 22:50:27;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 00:0c:29:a6:38:e5;
+}
+
+)
+
+이번 학습상황에서는
+
+lease 192.168.127.202 {
+  starts 5 2021/12/24 22:50:27;
+  ends 2 2021/12/28 22:50:27;
+  cltt 5 2021/12/24 22:50:27;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 00:0c:29:a6:38:e5;
+}
+
+를 예로 들겠습니다.
+
+lease 192.168.127.202 {
+와
+hardware ethernet 00:0c:29:a6:38:e5;
+을 잘 보면 되는데,
+
+00:0c:29:a6:38:e5 이라는 MAC 주소를 가진 객체에게 
+192.168.127.202 이라는 주소를 줬다는것을 뜻합니다.
+
+
+lease [] {
+  starts 5 2021/12/24 22:50:27;
+  ends 2 2021/12/28 22:50:27;
+  cltt 5 2021/12/24 22:50:27;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 00:0c:29:a6:38:e5;
+}
+

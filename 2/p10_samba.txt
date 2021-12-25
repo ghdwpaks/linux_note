@@ -1,0 +1,175 @@
+문제 내용 :
+client(192.168.127.129)에서 samba 를 이용해 윈도우에서 파일 열고 저장하기
+
+윈도우가 접속할때 사용할 계정은
+testuser 이라는 이름의 유저이고
+ghdwpaks 이 비밀번호이다.
+
+문제 해결 :
+
+만약 client 에 samba 가 없을 경우에는
+
+yum -y install samba-*
+를 입력하여 samba 관련 패키지를 받아준다
+
+vi /etc/samba/smb.conf
+를 입력하여 samba 의 설정파일을 열어준다.
+파일 내용 예시 (*
+
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+
+[global]
+	workgroup = SAMBA
+	security = user
+	
+	passdb backend = tdbsam
+
+	printing = cups
+	printcap name = cups
+	load printers = yes
+	cups options = raw
+
+[homes]
+	comment = Home Directories
+	valid users = %S, %D%w%S
+	browseable = No
+	read only = No
+	inherit acls = Yes
+
+[printers]
+	comment = All Printers
+	path = /var/tmp
+	printable = Yes
+	create mask = 0600
+	browseable = No
+
+[print$]
+	comment = Printer Drivers
+	path = /var/lib/samba/drivers
+	write list = @printadmin root
+	force group = @printadmin
+	create mask = 0664
+	directory mask = 0775
+)
+
+workgroup = SAMBA
+이라고 적혀있는 곳을
+
+workgroup = WORKGROUP
+으로 바꿔주고,
+
+
+여기서 파일 말단에
+
+[userShare_client]
+	comment = client test
+	path = /samba/user
+	writeable = Yes
+	read only = No
+	valid users = @testuser
+을 넣어주고 저장하고 나옵니다
+
+파일 결과 예시 (*
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+
+[global]
+	workgroup = WORKGROUP
+	security = user
+	
+	passdb backend = tdbsam
+
+	printing = cups
+	printcap name = cups
+	load printers = yes
+	cups options = raw
+
+[homes]
+	comment = Home Directories
+	valid users = %S, %D%w%S
+	browseable = No
+	read only = No
+	inherit acls = Yes
+
+[printers]
+	comment = All Printers
+	path = /var/tmp
+	printable = Yes
+	create mask = 0600
+	browseable = No
+
+[print$]
+	comment = Printer Drivers
+	path = /var/lib/samba/drivers
+	write list = @printadmin root
+	force group = @printadmin
+	create mask = 0664
+	directory mask = 0775
+[userShare_client]
+	comment = client test
+	path = /samba/user
+	writeable = Yes
+	read only = No
+	valid users = @testuser
+
+)
+
+이제 samba 관련 파일 설정은 끝났으니, 유저를 만들고 설정해보겠습니다 
+
+useradd testuser
+을 입력하여 testuser 계정을 생성해주고,
+
+passwd testuser
+을 입력하고
+
+ghdwpaks
+과
+ghdwpaks
+을 입력하여 testuser 의 비밀번호를 'ghdwpaks' 으로 맞춰줍니다. 두번 입력하는 이유가, 하나는 질문응답용이고, 하나는 오타방지를 위한 확인절차때문입니다.
+
+smbpasswd -a testuser
+에도
+
+ghdwpaks
+과
+ghdwpaks
+을 입력해줍니다
+
+이렇게 설정을 끝냈으니
+
+systemctl restart smb
+데몬을 다시 시작해주고,
+
+firewall-cmd --permanent --add-service=samba
+를 입력하여 방화벽 예외처리도 해주고
+
+firewall-cmd --reload
+를 입력하여 방화벽을 다시 시작해서 앞서 설정한 예외처리를 진짜로 적용시켜줍니다.
+
+
+.
+
+
+
+아래의 과정은 windows 에서 진행합니다.
+
+Window 키 + R
+을 입력해서 PowerShell 을 켜주고
+
+\\192.168.127.129
+를 입력해줍니다.
+
+그리고 자격증명에
+
+testuser 와 ghdwpaks 을 입력해줍니다.
+
+정상적으로 userShare_client 폴더를 찾을 수 있게 됩니다.
+
+
+
+

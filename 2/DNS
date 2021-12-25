@@ -1,4 +1,58 @@
+DNS
+    -Domain Name Service / Domain Name System
+
+    -Internet 에 존재하는 무수히 많은 서버들을 쉽게 기억할 수 있도록 문자주소(FQDN)를 이용한 접근을 도와주는 서버
+        > 문자주소(FQDN) <-> IP address 상호 변환
+            * FQDN 은 일반적으로 말하는 도메인 주소 
+                > host name 과 domain name 으로 구성, 일반적으로 domain anme 은 한 회사의 네트워크, host name 은 각 서버 장치 (예시 : www.google.com 이라는 주소가 있다면 www 가 host name, google.com 이 domain name)
+
+                > 영문자 및 숫자를 사용한 이름으로 서버에 대한 접근이 가능함
+    
+    - InterNIC 에서 관리하는 Domain Namespace 라는 트리 구조에 맞춰서 FQDN 이 구성
+        > DNS 서버는 Namespace 최상단 부터 각 계층별 nameserver 를 거쳐가면서 FQDN 에 대한 IP 주소를 탐색한다
+    
+    - 정보
+        패키지  : bind-*
+        데몬    : name
+        방화벽  : port=53/tcp , service=dns
+        설정파일: /etc/named.conf
+
+    Domain Namespace 구조
+        -효율적인 관리를 위해 최상단에 위치한 root domain 에서 top-level domain 으로, top-level domain은 second-level domain 으로 각각 위임 처리를 하고, second-level domain 에서 목적지 FQDN 의 IP 를 확인
+
+        -구조 예시
+            .       - com   - naver
+                            - google    - www
+                                        - drive
+                                        - news
+                            - nate
+                    - net
+                    - org
+            [root   [top    [second     [host
+            domain] level   level       name]
+                    domain] doamin]
+        
+        - root domain
+            InterNIC 에서 관리하는 Doamin Namespace 의 최상위 서버
+            전 세계에 총 13 개가 있으며 a ~ m 까지 이름을 붙여서 관리함
+
+        - top-level domain
+            FQDN 의 마지막 한 단어 (예시. com, net, org 등등)
+        
+        - second-level domain
+            일반적으로 각 회사에서 관리하는 nameserver
+
+            host name 의 정보를 record 로 가지고 있다   *record : DNS server 에서 사용하는 자원
+            (예시 : google.com, naver.com)
+
+
+
+
 DNS server 의 역할
+
+    yum -y install bind-*
+    를 입력하고 시작해주시기 바랍니다.
+
     1. IP address 와 FQDN 을 상호 변환
         ex. 사용자가 client 에 FQDN 을 입력하면
             1) client 장치는 자신의 cache 확인(hosts 파일 확인 -> DNS cache 확인)

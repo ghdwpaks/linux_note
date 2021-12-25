@@ -1,0 +1,191 @@
+ 
+이 namde.conf 파일 자체는 DNS 서버 역할에 대한 설정파일입니다.
+
+이 파일의 주석은 // 으로 구성됩니다.
+
+(*
+
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+// See the BIND Administrator's Reference Manual (ARM) for details about the
+// configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
+
+options {
+        listen-on port 53 { 127.0.0.1; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { localhost; };
+
+        /*
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable
+           recursion.
+         - If your recursive DNS server has a public IP address, you MUST enable access
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface
+        */
+        recursion yes;
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.root.key";
+
+        managed-keys-directory "/var/named/dynamic";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+)
+
+=====================================================================================================
+이 파일의 주석은 // 으로 구성됩니다.
+
+
+options {
+        listen-on port 53 { 127.0.0.1; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { localhost; };
+
+        /*
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable
+           recursion.
+         - If your recursive DNS server has a public IP address, you MUST enable access
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface
+        */
+        recursion yes;
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.root.key";
+
+        managed-keys-directory "/var/named/dynamic";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+
+파일 내용들 중, 이 부분은 옵션을 담당합니다.
+
+listen-on port 53 { 127.0.0.1; };
+이 구문을
+listen-on port 53 { any; };
+로 바꿔주면
+'누구나 내 53 번 포트로 들어올 수 있게 하겠다'라는 내용으로 바뀌게 됩니다.
+
+
+그 바로 아래에 있는
+listen-on-v6 port 53 { ::1; };
+이 구문은, 위와 같은 내용을 IPv6 에도 적용시킨다는 내용입니다.
+
+
+allow-query     { localhost; };
+라는 구문의 뜻은, DNS 질의를 누구에게 허용해줄것이냐? 라는 내용입니다.
+allow-query 와 listen-on port 53 은 거의 같은 구문이라고 보시면 되고
+이들의 설정값을 똑같이 맞춰주는게 웬만해서는 좋습니다.
+
+
+recursion yes;
+이 구문은 이 DNS 서버를 외부에서 누구나 접근할 수 있게 하느냐에 대한 내용입니다.
+
+
+directory       "/var/named";
+dump-file       "/var/named/data/cache_dump.db";
+statistics-file "/var/named/data/named_stats.txt";
+memstatistics-file "/var/named/data/named_mem_stats.txt";
+recursing-file  "/var/named/data/named.recursing";
+secroots-file   "/var/named/data/named.secroots";
+와 같이, 파일의 경로가 절대경로로 정해져 있는것을 쉽게 볼 수 있습니다.
+이렇지 않은 경우들이 있는경우,
+
+directory       "/var/named";
+"/var/named" 안에 들어있다는 뜻입니다.
+
+
+
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+이 부분은 로그를 기록하는 로깅 영역을 담당합니다.
+
+file "data/named.run";
+문장을 보면, 파일의 경로가 절대경로로 설정되어있지 않는것을 볼 수 있습니다.
+그래서 기본적으로는
+"/var/named"
+경로에 있는 파일 안에 있습니다.
+
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+이 부분은 root 힌트 영역입니다.
+자세한 내용은 f12_named_ca 에서 다룹니다.
+
+
+
+이 영역의 기본 형식은
+zone "[zone name]" IN {
+        [option];
+};
+
+그래서 위의 구문을 해석해보자면
+"/var/named" 안에 들어있고
+hint 영역이라고 이름지어져 있으며
+namde.ca 안에 들어있다고 합니다.
+
+
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+이 부분은 참조 영역을 나타냅니다
+
+앞으로 알아볼 내용은 
+include "/etc/named.rfc1912.zones";
+을 중점으로 알아보겠습니다 
+

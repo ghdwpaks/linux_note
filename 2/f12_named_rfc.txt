@@ -1,0 +1,53 @@
+이 문서는
+도메인 평문 제공 서비스(DNS)에 관한 내용을 다루는
+/etc/named.rfc1912.zones 에 대해 서술합니다.
+
+이 파일은 rfc 형식에 맞춰 zone 들에 대한 내용이 모여있습니다
+
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+(*
+
+// named.rfc1912.zones:
+//
+// Provided by Red Hat caching-nameserver package
+//
+// ISC BIND named zone configuration for zones recommended by
+// RFC 1912 section 4.1 : localhost TLDs and address zones
+// and http://www.ietf.org/internet-drafts/draft-ietf-dnsop-default-local-zones-02.txt
+// (c)2007 R W Franks
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+
+zone "localhost.localdomain" IN {
+        type master;
+        file "named.localhost";
+        allow-update { none; };
+};
+
+zone "localhost" IN {
+        type master;
+        file "named.localhost";
+        allow-update { none; };
+};
+
+zone "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa" IN {
+        type master;
+        file "named.loopback";
+        allow-update { none; };
+};
+
+zone "1.0.0.127.in-addr.arpa" IN {
+        type master;
+        file "named.loopback";
+        allow-update { none; };
+};
+
+zone "0.in-addr.arpa" IN {
+        type master;
+        file "named.empty";
+        allow-update { none; };
+};
+
+)

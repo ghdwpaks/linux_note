@@ -1,0 +1,23 @@
+이 문서는
+도메인 평문 제공 서비스(DNS)에 관한 내용을 다루는
+/etc/hosts 에 대해 서술합니다.
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+위와 같은 내용은... 루프 백에 관한것이기 때문에 여러가지가 써져있고,
+
+192.168.127.128     www.naver.com www.google.com
+같은 내용을 추가하고, DNS 서비스를 초기화시키면
+
+브라우저로 접속하거나 나 ping 을 보낼때
+www.naver.com
+또는
+www.google.com
+으로 접속하려 한다면
+
+192.168.127.128 로 연결됩니다.
+
+신호가 없거나, 응답이 없다면 크게 문제가 있는게 아니라
+해당 아이피를 가진 기기에서 웹페이지를 열지 않았기 때문입니다.

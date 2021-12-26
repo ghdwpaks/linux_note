@@ -1,0 +1,368 @@
+이 문서는 DNS 를 설정하다 보면 만날 수 있는 각종 오류들의 구분방법과 출력 방법 등등을 서술합니다.
+
+systemctl status named | journalctl -xe
+
+'잘 진행되다가 이상함'
+
+
+.
+
+
+모든 시작은 '문제 인식'으로부터 시작합니다.
+이 모든 과정은 창을 작게 하지 않는것을 강력히 권장합니다. 
+텍스트가 나오다가 잘리는 경우가 생깁니다.
+
+systemctl restart named
+이후에
+Job for named.service failed because the control process exited with error code. See "systemctl status named.service" and "journalctl -xe" for details.
+같은 구문이 출력된다면 오류에 걸린것입니다. 아니면 이러한 구문이 뜨지 않더라도
+
+systemctl status named
+로 named 서비스의 상태를 확인했을때 무언가 이상하고 active 같은 '정상 작동중'이라는 구문이 뜨지 않은 영우에는 문제가 생긴것이라고 인식하는게 좋습니다.
+
+
+.
+
+
+이제 '문제 해결'의 시간입니다.
+위에서 떴었던것처럼 
+
+systemctl status named.service
+와
+journalctl -xe
+를 통해 어떠한 문제가 발생했는지 확실하게 알아보라고 나옵니다.
+
+systemctl status named | journalctl -xe
+을 입력하여 상세한 캐시 기록을 확인해보겠습니다.
+
+
+.
+
+
+url 입력 실수 문제 상황입니다.
+
+11월 23 31:31:45 server bash[5513]: zone localhost.localdomain/IN: loaded serial 0
+11월 23 31:31:45 server bash[5513]: zone localhost/IN; loaded serial 0
+12월 26 00:26:20 server bash[2011]: zone 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa/IN: loaded serial 0
+11월 23 31:31:45 server bash[5513]: zone 1.0.0.127.in-addr.arpa/IN: loaded serial 0
+11월 23 31:31:45 server bash[5513]: zone 0.in-addr.arpa/IN: loaded serial 0
+11월 23 31:31:45 server bash[5513]: zone linux.edu/IN: loaded serial 0
+11월 23 31:31:45 server bash[5513]: zone 127.168.192.in-addr.arpa/IN: NS 'linux.edu.127.168.192.in-addr.arpa' has no address rec
+11월 23 31:31:45 server bash[5513]: zone 127.168.192.in-addr.arpa/IN: not loaded due to errors.
+11월 23 31:31:45 server bash[5513]: _default/127.168.192.in-addr.arpa/IN; bad zone
+11월 23 31:31:45 server polkid[581]: Unregistered Authentication Agent for unix-process:5504:941337 (system bus name :1.187,
+11월 23 31:31:45 server systemd[1]: named.service: control process exited, code=exited status=1
+11월 23 31:31:45 server systemd[1]: Failed to start Berkeley Internet Name Domain (DNS).
+
+같은 구문에서 문제 없는 부분은
+11월 23 31:31:45 server bash[5513]: zone localhost.localdomain/IN: loaded serial 0
+같이
+serial 0
+라고 뜨는 곳은 웬만하면 이상이 없다는 이야기입니다.
+
+실질적인 문제는 '잘 가다가 이상해짐' 에서 발생하게 됩니다.
+11월 23 31:31:45 server bash[5513]: zone 127.168.192.in-addr.arpa/IN: NS 'linux.edu.127.168.192.in-addr.arpa' has no address rec
+같은 곳에서 말이죠.
+이번 경우에는 'has no address rec' 라고 하네요.
+이러한 'has no address rec'같은 경우에는
+/ver/named 
+안에 들어있는 파일이 문제가 되는 경우가 많습니다.
+
+이 파일 안에는 다음과같은 파일이 있는데,
+[root@server named]# ll
+합계 24
+-rw-rw---- 1 root  named  183 12월 25 11:04 192.168.127.zone
+drwxr-x--- 7 root  named   61 12월 25 09:43 chroot
+drwxr-x--- 7 root  named   61 12월 25 09:43 chroot_sdb
+drwxrwx--- 2 named named   23 12월 25 11:58 data
+drwxrwx--- 2 named named   60 12월 26 00:26 dynamic
+drwxrwx--- 2 root  named    6  4월  1  2020 dyndb-ldap
+-rw-rw---- 1 root  named  197 12월 25 11:19 linux.edu.zone
+-rw-r----- 1 root  named 2253  4월  5  2018 named.ca
+-rw-r----- 1 root  named  152 12월 15  2009 named.empty
+-rw-r----- 1 root  named  152  6월 21  2007 named.localhost
+-rw-r----- 1 root  named  168 12월 15  2009 named.loopback
+drwxrwx--- 2 named named    6 11월 25 01:38 slaves
+[root@server named]# 
+
+그중에서도
+
+[root@server named]# ll *.zone
+-rw-rw---- 1 root named 183 12월 25 11:04 192.168.127.zone
+-rw-rw---- 1 root named 197 12월 25 11:19 linux.edu.zone
+[root@server named]#
+를 중점으로 보시면 문제를 해결하는데에 있어서 아주 큰 도움이 될 것입니다.
+이중에서 문제가 일어났는데, 특히 'has no address rec' 문제이니까 
+f12_zone.txt 문서에 서술되어있는
+    IN      NS      linux.edu.
+    IN      A       192.168.127.128
+쪽에서 문제가 일어났을 가능성이 큽니다.
+
+이번 경우에는 
+IN      NS      linux.edu.
+라고 써야했었는데
+IN      NS      linux.edu
+라고만 적어놔서 문제가 일어났었네요.
+수정하고,
+
+systemctl restart named
+를 입력하여 정상작동하는지 알아보겠습니다.
+
+
+.
+
+
+세미콜론 미입력 문제 상황에 대한 내용입니다.
+틍징으로써는 세미콜론과 중괄호 missing 오류 구문이 많다는게 특징입니다
+
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zone:47: missing ';' before 'allow-transfer'
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zone:48: missing ';' before '}'
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zone:54: missing ';' before 'allow-transfer'
+11월 23 31:31:45 server bash[8875]: /etc/named.conf:60: missing ';' before 'include'
+11월 23 31:31:45 server bash[8875]: /etc/named.root.key:1: unknown option 'managed-keys'
+11월 23 31:31:45 server bash[8875]: /etc/named.conf:62 '}' expected near end of file
+11월 23 31:31:45 server systemd[1]: named.service: contol process exited, code=exited status=1 
+11월 23 31:31:45 server polkitd[574]: Unregistered Authentication Agent for unix-process:8866:697388
+11월 23 31:31:45 server systemd[1]: Failed to start Berkeley Internet Name Domain (DNS).
+
+이러한 구문이 출력된 경우 파일과 그 파일의 라인이 정확하게 나옵니다.
+맨 첫번째 줄인 
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zone:47: missing ';' before 'allow-transfer'
+을 예로 들자면
+
+/etc/named.rfc1912.zone 파일의 
+47 번째 줄에 
+before 'allow-transfer' , 'allow-transfer' 하기 전에
+missing ';' 세미콜론을 찾지 못했다
+
+라는 뜻입니다.
+
+이제 문제가 어디서 발생했는지 바로 알았으니
+
+vi /etc/named.rfc1912.zone
+으로 문제를 해결하러 가보겠습니다.
+
+이번 문제 상황에서는 원래대로
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "192.168.127.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+라고 적혀있어야했는데
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master
+        file "192.168.127.zone"
+        allow-update {any;}
+        allow-transfer {any;}
+};
+라고 되어있었습니다.
+
+다시 정상적으로 수정해주고 저장하고, 나오겠습니다.
+
+
+systemctl restart named
+를 입력하여 정상작동하는지 알아보겠습니다.
+
+
+.
+
+
+단어를 잘못 선택한 경우에 대해 서술합니다.
+
+이번 경우에는 오류 구문이 아주 적은게 특징입니다.
+
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zones:47: unknown option 'allow-trasfer'
+11월 23 31:31:45 server systemd[1]: named.service:control process exited, code=exited status=1
+11월 23 31:31:45 server systemd[1]: Failed to start Berkeley Internet Name Domain (DNS).
+
+이번 구문에서는
+11월 23 31:31:45 server bash[8875]: /etc/named.rfc1912.zones:47: unknown option 'allow-trasfer'
+이 문장 하나에서
+/etc/named.rfc1912 파일에서
+zones   존 설정 영역인데
+47      번째 줄에 있는
+unknown option 알지 못한 옵션인
+'allow-trasfer' 이 적혀있어서 에러가 났다.
+라고 합니다.
+
+vi /etc/named.rfc1912.zones
+로 들어간 다음
+
+:/trasfer
+을 입력하여 문제가 생긴 줄로 이동합니다.
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "192.168.127.zone";
+        allow-update {any;};
+        allow-trasfer {any;};
+};
+이라고 입력되어 있었네요. 정상적으로 
+        allow-trasnfer {any;};
+이라고 바꿔준 후 vi 를 나오고
+
+systemctl restart named
+로 정상작동을 확인합니다.
+
+
+.
+
+
+진짜 정상 작동 확인 을 하겠습니다.
+
+앞서 실행했던
+systemctl restart named
+systemctl status named
+명령어들은 그저 DNS 데몬이 정상적으로 구동이 되는지 확인한것 뿐이였습니다.
+
+이제 정말로 DNS 기능이 정상작동하는지 확인하는 과정을 설명하겠습니다.
+
+vi /etc/resolv.conf
+파일을 열어서, 맨 처음 FQDN 을 검색하는 주소를 나 자신으로 설정해두겠습니다.
+
+# Generated by NetworManager
+nameserver 192.168.127.128
+nameserver 192.168.127.2
+
+라고 적겠습니다. 다르게 적는다면
+
+
+# Generated by NetworManager
+nameserver 192.168.10.128
+nameserver 192.168.10.2
+라고도 적을 수 있을것 같습니다.
+
+'나 자신의 DNS'를 '제일 먼저'찾는다는게 중요합니다.
+맨 첫째줄에 적힌
+nameserver 192.168.127.128
+이 문장 이외에 다음 문장에 뭐가 적히든 상관 없으나 (주석을 제외하고) 맨 처음 오는 문장은 이렇게 나 자신을 찾는 문장이여야합니다.
+
+이제 n(ame)s(server)lookup으로 통신확인을 해보겠습니다.
+
+nslookup
+을 입력합니다.
+
+www.linux.edu 를 쳤을때
+
+>www.linux.edu
+Server:     192.168.127.128
+Address:    192.168.127.128#53
+
+Name:       www.linux.edu
+Address:    192.168.127.128
+>
+
+이라고 나오고, 192.168.127.128 이라고 쳤을때
+
+>192.168.127.128
+129.127.168.192.in-addr.arpa    name = www.linux.edu.
+>
+
+이라고 나와야합니다.
+주소가 완전히 똑같지 않을 수도 있습니다. 하지만 겉으로 보기에
+위와 같은 출력 형식과 크게 다르지 않아야 합니다.
+
+버전마다 출력 형식이 다를 수 있습니다만 통상적으로 그래야한다는것이고
+최소한
+정상적인 FQDN 와 IPv4 가 출력되야하는것은 맞습니다.
+
+다만, 이 상황에서도 에러가 날 수 있습니다
+
+
+.
+
+
+nslookup 도중 일어날 수 있는 오류 상황에 대해 서술하겠습니다.
+
+
+[root@server named]# nslookup
+> www.linux.edu
+Server:         192.168.127.2
+Address:        192.168.127.2#53
+
+Non-authoritative answer:
+Name:   www.linux.EDU
+Address: 37.187.109.196
+Name:   www.linux.EDU
+Address: 2001:41d0:a:62c4::1
+> 192.168.127.128
+** server can't find 128.127.168.192.in-addr.arpa.: NXDOMAIN
+>
+이번 경우에 핵심은
+'없었다. 그래서 외부까지 가야했다.'
+라는겁니다.
+
+> www.linux.edu
+Server:         192.168.127.2
+Address:        192.168.127.2#53
+이 문단을 잘 보면 서버와 주소가 나타나있는데,
+Server:         192.168.127.2 를 보면
+이 FQDN 를 검색하는 DNS server 의 주소가 우리 자신인 192.168.127.128 이 아닌, 게이트웨이에 물어보고있다는 것이 특징입니다.
+
+
+우리가 앞서 정상적으로 설정을 해줬는데도, 데몬 실행이 정상적으로 이루어지고 있음에도 불구하고 이러한 일이 일어난다는것은
+
+resolv.conf 설정을 안해줬다는 뜻입니다.
+resolv.conf 설정을 정상적으로 해주지 않았음으로 우리가 설정한 DNS 에 들어있는 정보를 검색하지 못했고, 결국에는 이 FQDN 에 관한 내용이나 IPv4 에 관한 내용이 보이지 않자 외부 인터넷까지 나가 FQDN 와 IPv4 를 검색한것입니다.
+
+이 폴더의 
+f8_resolv_conf.txt
+파일 안에 이러한 내용이 있습니다.
+
+vi /etc/resolv.conf 
+로 파일을 열고, 첫째줄에 자신의 아이피를 넣습니다.
+
+nameserver 192.168.127.128
+을 입력하고, 저장하고, 나옵니다.
+
+
+[root@server named]# cat /etc/resolv.conf
+# Generated by NetworkManager
+nameserver 192.168.127.128
+nameserver 192.168.127.2
+[root@server named]#
+
+이렇게 설정해주고, 다시 nslookup 을 실행하면
+
+[root@server named]# nslookup
+> www.linux.edu
+Server:         192.168.127.128
+Address:        192.168.127.128#53
+
+Name:   www.linux.edu
+Address: 192.168.127.128
+> 192.168.127.128
+128.127.168.192.in-addr.arpa    name = www.linux.edu.
+> exit
+
+[root@server named]#
+
+잘 되는 모습을 볼 수 있습니다.
+
+
+다만, FQDN 는 잘 검색이 됐지만 IPv4 로 검색하는 경우에 정상적으로 검색이 되지 않는 경우가 있습니다. 이러한 경우에는 다음과 같은 출력이 특징입니다.
+
+[root@server named]# nslookup
+> www.linux.edu
+Server:         192.168.127.2
+Address:        192.168.127.2#53
+
+Name:   www.linux.edu
+Address: 192.168.127.128
+> 192.168.127.128
+** server can't find 128.127.168.192.in-addr.arpa.: NXDOMAIN
+>
+
+이러한 경우에는 linux.edu.zone 같은 파일은 정상적으로 작성됐지만
+192.168.127.zone 같은 파일의 작성이 이상하게 되어있는 경우입니다.
+
+해당 zone 파일들의 상태가 정상인 경우, named.rfc1912.zone 이 문제일겁니다.
+특히 이번 경우에는
+FQDN 은 검색할 수 있었으나 IPv4 는 검색할 수 없었기 때문에
+zone "127.168.192.in-addr.arpa" 쪽이 문제였습니다.
+
+

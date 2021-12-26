@@ -1,0 +1,174 @@
+이 문서는
+DNS 에 관한 내용을 다루는
+'/var/named 안에 있는 zone 으로 끝나는 파일들' 에 대해 서술합니다.
+경우에 따라서 /var/named 안에 없을 수도 있으나
+
+zone 으로 끝나는 파일들은 변함없습니다.
+(*파일 검색 예시 : ls *.zone)
+
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+[root@server named]# cat 192.168.127.zone
+$TTL 1D
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+128     IN      PTR     www.linux.edu.
+[root@server named]#
+
+
+[root@server named]# cat linux.edu.zone
+$TTL 86400
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        86400   ; refresh
+                                        3600    ; retry
+                                        604800  ; expire
+                                        10800 ) ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+www     IN      A       192.168.127.128
+[root@server named]#
+
+1D = 86400
+1H = 3600
+1W = 604800
+3H = 10800
+입니다. 따라서
+이 두 파일의 다른점은 마지막 줄 하나뿐입니다.
+
+이 파일에는 크게 3가지 영역이 있습니다.
+
+[root@server named]# cat 192.168.127.zone
+$TTL 1D                                 |
+@       IN SOA  linux.edu.              |root(
+                                        |0       ; serial
+                                        |1D      ; refresh
+                                        |1H      ; retry
+                                        |1W      ; expire
+                                        |3H )    ; minimum
+----------------------------------------|---------------------
+        IN      NS      linux.edu.      |
+        IN      A       192.168.127.128 |
+                                        |
+128     IN      PTR     www.linux.edu.  |
+[root@server named]#                    |
+
+===============================================================================================
+
+[root@server named]# cat linux.edu.zone
+$TTL 86400
+@       IN SOA  linux.edu.              |root(
+                                        |0       ; serial
+                                        |86400   ; refresh
+                                        |3600    ; retry
+                                        |604800  ; expire
+                                        |10800 ) ; minimum
+----------------------------------------|-------------------
+        IN      NS      linux.edu.      |
+        IN      A       192.168.127.128 |
+                                        |
+www     IN      A       192.168.127.128 |
+[root@server named]#                    |
+
+대충 절취선으로 자르자면 다음과 같이 나눌 수 있습니다.
+
+왼쪽 위 부분
+    $TTL 1D
+    $TTL 86400
+    생존시간을 나타냅니다. 이 파일이 얼마나 유지되는지에 관한 내용입니다.
+
+    @
+    는 구분자로써 그냥 들어갑니다.
+
+    IN
+    인터넷에서 사용된다는 내용의 클래스 정보입니다.
+
+    SOA
+    시작과 인증에 대한 정보입니다.
+
+    linux.edu.
+    SOA에게 인증받을 주소입니다. 그리고 그 주소에 대한 정고는 '오른쪽 위'와 '왼쪽 아래'에 있는 섹션들에 적혀있습니다.
+
+왼쪽 아래 부분
+    '레코드'라고 합니다.
+    
+    이 중에서 nameserver 영역과 host 영역이 있는데
+    nameserver 는
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+    같은 영역입니다.
+    
+
+    IN      NS      linux.edu.
+    IN      A       192.168.127.128
+    에서, NS 는 뒤에 따라붙는 'linux.edu.'라는 문장이 N(ame)S(erver) 형식이라는 의미를 담고있습니다.
+    에서, A 는 뒤에 따라붙는 'linux.edu.' 라는 문장이 A(ddress) 형식이라는 의미를 담고있습니다.
+
+
+    Second-level 도메인 주소를 적어놓고, 그에 대응하는 IPv4 주소를 적어놓은것입니다.
+    (*Second-level 는 DNS.txt 파일에 서술되어있습니다.)
+
+    
+    host 는
+        www     IN      A       192.168.127.128
+        또는
+        128     IN      PTR     www.linux.edu.
+    같은 영역을 뜻합니다.
+    
+    zone "linux.edu" + www = www.linux.edu
+    같은 서식으로써 우리가 사용하는 URL 이 사용됩니다.
+
+    zone "127.168.192.in-addr.arpa" + 128 >> 192.168.127.128 
+    같은 서식으로써, 우리가 사용하는 IPv4가 됩니다.
+
+오른쪽 위 부분
+    시간 의 영역입니다.
+    root(
+    0       ; serial
+    86400   ; refresh
+    3600    ; retry
+    604800  ; expire
+    10800 ) ; minimum
+    이라는 정보를 예로 들자면
+
+    [1] (
+    [2]      ;serial
+    [3]      ;refresh
+    [4]      ;retry
+    [5]      ;expire
+    [6] )    ;minimum
+
+    기본적으로 이 모든 구문은 [1] 자리에 있는 계정의 권한으로 모든것이 진행된다는 이야기입니다. 이번 구문에는 root 의 계정의 권한으로써 이 DNS 정보가 작성되었다는것을 뜻합니다.
+
+    내부에 들어가는 값은
+    [2] 와 [3],[4],[5] 와 [6] 으로써 3등분 해서 인식하면 됩니다.
+    serial  : 일련번호
+    refresh : 갱신 시도 주기            (정보의 생존 시간에 관련된 내용)
+    retry   : 갱신 재시도 주기          (정보의 생존 시간에 관련된 내용)
+    expire  : 갱신 실패 시 파기 시점    (정보의 생존 시간에 관련된 내용)
+    minimum : 정보의 최소 생존 시간
+
+    serial 은 '원칙적으로, 정보가 바뀐다면 + 1 을 해야한다.'라고 합니다. 이것은 master zone 과 slave zone 의 연관성에 대해 간섭하는 정보로써 serial 앞에 적힌 숫자를 통해 업데이트가 되었는지, 얼마나 되었는지 구분할 수 있는 척도가 됩니다.
+
+    refresh 은 앞에 적힌 시간 이후에 갱신을 시도합니다. 만약에 갱신에 성공하면 0초부터 다시 시작합니다. 
+    retry 는 refresh 에서 갱신에 실패한다면 retry 시간 이후에 다시, 계속해서 시도합니다.
+    expire 은 앞에 적힌 시간 안에 갱신에 실패한다면, 정보를 파기한다는 내용입니다.
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,248 @@
+
+DNS 설정에 대한 전체적인 맥락에 대한 문서입니다.
+
+행운을 빌겠습니다.
+
+시작합니다.
+
+vi /etc/named.conf
+/etc/named.conf 엽니다
+
+listen-on port 53 { any; };
+allow-query { any ; };
+
+바꿉니다.
+
+나옵니다.
+
+/etc/named.conf의 내용물
+
+[root@server ~]# cat /etc/named.conf
+//
+// named.conf
+//
+// Provided by Red Hat bind package to configure the ISC BIND named(8) DNS
+// server as a caching only nameserver (as a localhost DNS resolver only).
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+// See the BIND Administrator's Reference Manual (ARM) for details about the
+// configuration located in /usr/share/doc/bind-{version}/Bv9ARM.html
+
+options {
+        listen-on port 53 { any; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { any; };
+
+        /*
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable
+           recursion.
+         - If your recursive DNS server has a public IP address, you MUST enable access
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface
+        */
+        recursion yes;
+
+        dnssec-enable yes;
+        dnssec-validation yes;
+
+        /* Path to ISC DLV key */
+        bindkeys-file "/etc/named.root.key";
+
+        managed-keys-directory "/var/named/dynamic";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+[root@server ~]#
+
+저장하고 나온 다음
+
+vi /etc/named.rfc1912.zones
+로 엽니다
+
+파일 말단으로 이동하여
+
+
+zone "linux.edu" IN {
+        type master;
+        file "linux.edu.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "192.168.127.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+을 입력합니다.
+
+저장하고
+나옵니다.
+
+/etc/named.rfc1912.zones 의 내용물
+
+[root@server ~]# cat /etc/named.rfc1912.zones
+// named.rfc1912.zones:
+//
+// Provided by Red Hat caching-nameserver package
+//
+// ISC BIND named zone configuration for zones recommended by
+// RFC 1912 section 4.1 : localhost TLDs and address zones
+// and http://www.ietf.org/internet-drafts/draft-ietf-dnsop-default-local-zones-02.txt
+// (c)2007 R W Franks
+//
+// See /usr/share/doc/bind*/sample/ for example named configuration files.
+//
+
+zone "localhost.localdomain" IN {
+        type master;
+        file "named.localhost";
+        allow-update { none; };
+};
+
+zone "localhost" IN {
+        type master;
+        file "named.localhost";
+        allow-update { none; };
+};
+
+zone "1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa" IN {
+        type master;
+        file "named.loopback";
+        allow-update { none; };
+};
+
+zone "1.0.0.127.in-addr.arpa" IN {
+        type master;
+        file "named.loopback";
+        allow-update { none; };
+};
+
+zone "0.in-addr.arpa" IN {
+        type master;
+        file "named.empty";
+        allow-update { none; };
+};
+
+zone "linux.edu" IN {
+        type master;
+        file "linux.edu.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "192.168.127.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+[root@server ~]#
+
+
+touch 192.168.127.zone
+touch linux.edu.zone
+을 하여 zone 형식 파일을 만든다.
+
+vi 192.168.127.zone
+안에
+$TTL 1D
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+128     IN      PTR     www.linux.edu.
+을 입력한다.
+
+192.168.127.zone
+안에 내용은 다음과 같다.
+[root@server named]# cat 192.168.127.zone
+$TTL 1D
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+128     IN      PTR     www.linux.edu.
+[root@server named]#
+
+vi linux.edu.zone
+안에
+$TTL 86400
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        86400   ; refresh
+                                        3600    ; retry
+                                        604800  ; expire
+                                        10800 ) ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+www     IN      A       192.168.127.128
+입력한다.
+
+linux.edu.zone
+내용은 다음과 같다.
+[root@server named]# cat linux.edu.zone
+$TTL 86400
+@       IN SOA  linux.edu.              root(
+                                        0       ; serial
+                                        86400   ; refresh
+                                        3600    ; retry
+                                        604800  ; expire
+                                        10800 ) ; minimum
+        IN      NS      linux.edu.
+        IN      A       192.168.127.128
+
+www     IN      A       192.168.127.128
+[root@server named]#
+
+chmod 660 *.zone
+으로 권한을 바꾸고
+
+chown .named *.zone
+으로 주인을 바꾸고
+
+systemctl restart named
+를 입력하여 여태까지 설정한 정보들을 적용시킨다.
+
+
+

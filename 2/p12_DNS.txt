@@ -1,0 +1,101 @@
+
+www.ghdwpaks.com
+도메인 세팅하기
+
+
+문제 해결 :
+
+0. yum -y install bind-*
+0. named.conf 설정
+1. /etc/named.rfc1912.zones 에 zone 추가
+2. /var/named 에 zone 파일 추가 및 설정
+3. zone 파일들 권한 설정
+4. /etc/resolv.conf 파일 설정
+5. named 데몬 재실행
+
+
+0. named.conf 설정
+    
+    listen-on port 53 { any; };
+    allow-query     { any; };
+    dnssec-enable yes;
+
+
+
+1. /etc/named.rfc1912.zones 에 zone 추가
+zone "linux.edu" IN {
+        type master;
+        file "linux.edu.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "192.168.127.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+형식
+
+[1] = linux.edu
+zone "[1]" IN {
+        type master;
+        file "[1].zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+192.168.127.128
+[2].[3].[4].[5]
+[2] = 192
+[3] = 168
+[4] = 127
+[5] = 128
+zone "[4].[3].[2].in-addr.arpa" IN {
+        type master;
+        file "[2].[3].[4].zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+2. /var/named 에 zone 파일 추가 및 설정
+
+touch [1].zone
+touch [2].[3].[4].zone
+으로 추가
+
+
+$TTL 1D
+@       IN SOA  [1].      root(
+                                0       ; serial
+                                1D      ; refresh
+                                1H      ; retry
+                                1W      ; expire
+                                3H )    ; minimum
+        IN      NS      [1].
+        IN      A       [2].[3].[4].[5]
+이라고 전부 작성
+
+www     IN      A       [2].[3].[4].[5]
+[5]     IN      PTR     www.[1]
+
+3. zone 파일들 권한 설정
+
+chmod 660 [1].zone
+chmod 660 [2].[3].[4].zone
+
+chown .named [1].zone
+chown .named [2].[3].[4].zone
+
+4. /etc/resolv.conf 파일 설정
+vi /etc/resolv.conf
+열어서
+맨 첫줄에
+nameserver 192.168.127.128
+넣기
+
+
+5. systemctl restart named
+

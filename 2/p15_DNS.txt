@@ -1,0 +1,77 @@
+
+FQDN : www.ghdghd.com
+IPv4 : 192.168.127.130
+도메인 세팅하기
+
+0. yum -y install bind-*
+0. named.conf 설정
+1. /etc/named.rfc1912.zones 에 zone 추가
+2. /var/named 에 zone 파일 추가 및 설정
+3. zone 파일들 권한 설정
+4. named 데몬 재실행
+
+
+0. named.conf 설정
+    
+    listen-on port 53 { any; };
+    allow-query     { any; };
+    dnssec-enable yes;
+
+
+1. /etc/named.rfc1912.zones 에 zone 추가
+zone "ghdghd.com" IN {
+        type master;
+        file "ghdghd.com.zone";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+zone "127.168.192.in-addr.arpa" IN {
+        type master;
+        file "ghdghd.rev";
+        allow-update {any;};
+        allow-transfer {any;};
+};
+
+2. /var/named 에 zone 파일과 rev 파일 추가 및 설정
+
+cp named.localhost ghdghd.zone
+vi ghdghd.zone
+으로 들어가서
+@       IN SOA  @ rname.invalid. (
+을
+@       IN SOA  ghdghd.com.     root(
+로 바꾼다.
+
+NS      @
+        A       127.0.0.1
+        AAAA    ::1
+을
+    IN  NS  ghdghd.com.
+    IN  A   192.168.127.130
+
+www IN  A   192.168.127.130
+으로 바꾼다
+
+나온다.
+
+cp ghdghd.zone ghdghd.rev
+vi ghdghd.rev
+로 들어간다
+
+www IN  A   192.168.127.130
+을
+130 IN  PTR www.ghdghd.com.
+으로 바꿔준다.
+
+3. zone 파일과 rev 파일 권한 설정
+chmod 660 ghdghd*
+chwon .named ghdghd*
+
+4. /etc/resolv.conf 파일 설정
+vi /etc/resolv.conf
+열어서 맨 첫줄에
+nameserver 192.168.127.128
+넣기
+
+5. systemctl restart named

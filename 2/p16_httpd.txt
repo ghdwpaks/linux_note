@@ -1,0 +1,85 @@
+문제 내용 :
+firefox 브라우저에 www.ghdwpaks.com 을 입력했을때
+또는, 자신의 아이피를 입력했을때
+
+ghd 홈 디렉토리 내부에 있는 index.html 화면을
+출력하도록 설정하기
+
+
+
+
+
+
+
+
+
+문제 해결 :
+vi /etc/httpd/conf/httpd.conf
+로 열고
+160번 행 즈음에 있는
+
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+을
+<IfModule dir_module>
+    DirectoryIndex /home/ghd/index.html
+</IfModule>
+으로 바꾼다.
+
+systemctl restart httpd 를 입력해서 데몬을 재시작해준다.
+
+
+
+
+
+
+
+
+
+다른 방식의 문제 해결 :
+
+vi /etc/httpd/conf/httpd.conf
+로 열고
+
+119행 쯤에 있는
+    DocumentRoot "/var/www/html"
+    을
+    DocumentRoot "/home/ghd"
+    으로 바꿔준다.
+
+124행쪽에 있는
+    <Directory "/var/www">
+        AllowOverride None
+        # Allow open access:
+        Require all granted
+    </Directory>
+    을
+    <Directory "/home">
+        AllowOverride None
+        # Allow open access:
+        Require all granted
+    </Directory>
+    으로 바꿔준다.
+
+131 행 쪽에 있는
+    # Further relax access to the default document root:
+    <Directory "/var/www/html">
+    을
+    # Further relax access to the default document root:
+    <Directory "/home/itbank">
+    로 바꿔준다.
+
+vi 를 나간다
+기본적으로 HTTP(d)서비스를 실행하고, 관제하는 계정은 apache 계정이기 때문에
+권한설정을 시작한다.
+
+파일의 소유 및 사용자도 아니고, 같은 그룹도 아니니
+'남'의 영역을 개방시켜줘야한다.
+
+chmod 701 /home/ghd/index.html
+-rwx-----x 로 바꿔 주는 이유는 보안상 707로 만들어버리면 apache 이외의 다른 유저들 또한 수정하고, 읽고, 실행시킬 수 있기 때문에 그저 '실행'의 권한 말 줄 수 있도록 701로 설정해줬다.
+
+systemctl restart httpd
+로 데몬을 다시 시작해준다.
+

@@ -1,0 +1,495 @@
+이 문서는
+httpd 웹 서버에 관한 내용을 다루는
+/etc/httpd/conf/httpd.conf 에 대해 서술합니다.
+파일 내용 예시에 대한 내용은 아래와 같습니다.
+
+[root@server home]# /etc/httpd/conf/httpd.conf 
+#
+# This is the main Apache HTTP server configuration file.  It contains the
+# configuration directives that give the server its instructions.
+# See <URL:http://httpd.apache.org/docs/2.4/> for detailed information.
+# In particular, see
+# <URL:http://httpd.apache.org/docs/2.4/mod/directives.html>
+# for a discussion of each configuration directive.
+#
+# Do NOT simply read the instructions in here without understanding
+# what they do.  They're here only as hints or reminders.  If you are unsure
+# consult the online docs. You have been warned.
+#
+# Configuration and logfile names: If the filenames you specify for many
+# of the server's control files begin with "/" (or "drive:/" for Win32), the
+# server will use that explicit path.  If the filenames do *not* begin
+# with "/", the value of ServerRoot is prepended -- so 'log/access_log'
+# with ServerRoot set to '/www' will be interpreted by the
+# server as '/www/log/access_log', where as '/log/access_log' will be
+# interpreted as '/log/access_log'.
+
+#
+# ServerRoot: The top of the directory tree under which the server's
+# configuration, error, and log files are kept.
+#
+# Do not add a slash at the end of the directory path.  If you point
+# ServerRoot at a non-local disk, be sure to specify a local disk on the
+# Mutex directive, if file-based mutexes are used.  If you wish to share the
+# same ServerRoot for multiple httpd daemons, you will need to change at
+# least PidFile.
+#
+ServerRoot "/etc/httpd"
+
+#
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# ports, instead of the default. See also the <VirtualHost>
+# directive.
+#
+# Change this to Listen on specific IP addresses as shown below to
+# prevent Apache from glomming onto all bound IP addresses.
+#
+#Listen 12.34.56.78:80
+Listen 80
+
+#
+# Dynamic Shared Object (DSO) Support
+#
+# To be able to use the functionality of a module which was built as a DSO you
+# have to place corresponding `LoadModule' lines at this location so the
+# directives contained in it are actually available _before_ they are used.
+# Statically compiled modules (those listed by `httpd -l') do not need
+# to be loaded here.
+#
+# Example:
+# LoadModule foo_module modules/mod_foo.so
+#
+Include conf.modules.d/*.conf
+
+#
+# If you wish httpd to run as a different user or group, you must run
+# httpd as root initially and it will switch.
+#
+# User/Group: The name (or #number) of the user/group to run httpd as.
+# It is usually good practice to create a dedicated user and group for
+# running httpd, as with most system services.
+#
+User apache
+Group apache
+
+# 'Main' server configuration
+#
+# The directives in this section set up the values used by the 'main'
+# server, which responds to any requests that aren't handled by a
+# <VirtualHost> definition.  These values also provide defaults for
+# any <VirtualHost> containers you may define later in the file.
+#
+# All of these directives may appear inside <VirtualHost> containers,
+# in which case these default settings will be overridden for the
+# virtual host being defined.
+#
+
+#
+# ServerAdmin: Your address, where problems with the server should be
+# e-mailed.  This address appears on some server-generated pages, such
+# as error documents.  e.g. admin@your-domain.com
+#
+ServerAdmin root@localhost
+
+#
+# ServerName gives the name and port that the server uses to identify itself.
+# This can often be determined automatically, but we recommend you specify
+# it explicitly to prevent problems during startup.
+#
+# If your host doesn't have a registered DNS name, enter its IP address here.
+#
+#ServerName www.example.com:80
+
+#
+# Deny access to the entirety of your server's filesystem. You must
+# explicitly permit access to web content directories in other
+# <Directory> blocks below.
+#
+<Directory />
+    AllowOverride none
+    Require all denied
+</Directory>
+
+#
+# Note that from this point forward you must specifically allow
+# particular features to be enabled - so if something's not working as
+# you might expect, make sure that you have specifically enabled it
+# below.
+#
+
+#
+# DocumentRoot: The directory out of which you will serve your
+# documents. By default, all requests are taken from this directory, but
+# symbolic links and aliases may be used to point to other locations.
+#
+DocumentRoot "/var/www/html"
+
+#
+# Relax access to content within /var/www.
+#
+<Directory "/var/www">
+    AllowOverride None
+    # Allow open access:
+    Require all granted
+</Directory>
+
+# Further relax access to the default document root:
+<Directory "/var/www/html">
+    #
+    # Possible values for the Options directive are "None", "All",
+    # or any combination of:
+    #   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
+    #
+    # Note that "MultiViews" must be named *explicitly* --- "Options All"
+    # doesn't give it to you.
+    #
+    # The Options directive is both complicated and important.  Please see
+    # http://httpd.apache.org/docs/2.4/mod/core.html#options
+    # for more information.
+    #
+    Options Indexes FollowSymLinks
+
+    #
+    # AllowOverride controls what directives may be placed in .htaccess files.
+    # It can be "All", "None", or any combination of the keywords:
+    #   Options FileInfo AuthConfig Limit
+    #
+    AllowOverride None
+
+    #
+    # Controls who can get stuff from this server.
+    #
+    Require all granted
+</Directory>
+
+#
+# DirectoryIndex: sets the file that Apache will serve if a directory
+# is requested.
+#
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+#
+# The following lines prevent .htaccess and .htpasswd files from being
+# viewed by Web clients.
+#
+<Files ".ht*">
+    Require all denied
+</Files>
+
+#
+# ErrorLog: The location of the error log file.
+# If you do not specify an ErrorLog directive within a <VirtualHost>
+# container, error messages relating to that virtual host will be
+# logged here.  If you *do* define an error logfile for a <VirtualHost>
+# container, that host's errors will be logged there and not here.
+#
+ErrorLog "logs/error_log"
+
+#
+# LogLevel: Control the number of messages logged to the error_log.
+# Possible values include: debug, info, notice, warn, error, crit,
+# alert, emerg.
+#
+LogLevel warn
+
+<IfModule log_config_module>
+    #
+    # The following directives define some format nicknames for use with
+    # a CustomLog directive (see below).
+    #
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%h %l %u %t \"%r\" %>s %b" common
+
+    <IfModule logio_module>
+      # You need to enable mod_logio.c to use %I and %O
+      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
+    </IfModule>
+
+    #
+    # The location and format of the access logfile (Common Logfile Format).
+    # If you do not define any access logfiles within a <VirtualHost>
+    # container, they will be logged here.  Contrariwise, if you *do*
+    # define per-<VirtualHost> access logfiles, transactions will be
+    # logged therein and *not* in this file.
+    #
+    #CustomLog "logs/access_log" common
+
+    #
+    # If you prefer a logfile with access, agent, and referer information
+    # (Combined Logfile Format) you can use the following directive.
+    #
+    CustomLog "logs/access_log" combined
+</IfModule>
+
+<IfModule alias_module>
+    #
+    # Redirect: Allows you to tell clients about documents that used to
+    # exist in your server's namespace, but do not anymore. The client
+    # will make a new request for the document at its new location.
+    # Example:
+    # Redirect permanent /foo http://www.example.com/bar
+
+    #
+    # Alias: Maps web paths into filesystem paths and is used to
+    # access content that does not live under the DocumentRoot.
+    # Example:
+    # Alias /webpath /full/filesystem/path
+    #
+    # If you include a trailing / on /webpath then the server will
+    # require it to be present in the URL.  You will also likely
+    # need to provide a <Directory> section to allow access to
+    # the filesystem path.
+
+    #
+    # ScriptAlias: This controls which directories contain server scripts.
+    # ScriptAliases are essentially the same as Aliases, except that
+    # documents in the target directory are treated as applications and
+    # run by the server when requested rather than as documents sent to the
+    # client.  The same rules about trailing "/" apply to ScriptAlias
+    # directives as to Alias.
+    #
+    ScriptAlias /cgi-bin/ "/var/www/cgi-bin/"
+
+</IfModule>
+
+#
+# "/var/www/cgi-bin" should be changed to whatever your ScriptAliased
+# CGI directory exists, if you have that configured.
+#
+<Directory "/var/www/cgi-bin">
+    AllowOverride None
+    Options None
+    Require all granted
+</Directory>
+
+<IfModule mime_module>
+    #
+    # TypesConfig points to the file containing the list of mappings from
+    # filename extension to MIME-type.
+    #
+    TypesConfig /etc/mime.types
+
+    #
+    # AddType allows you to add to or override the MIME configuration
+    # file specified in TypesConfig for specific file types.
+    #
+    #AddType application/x-gzip .tgz
+    #
+    # AddEncoding allows you to have certain browsers uncompress
+    # information on the fly. Note: Not all browsers support this.
+    #
+    #AddEncoding x-compress .Z
+    #AddEncoding x-gzip .gz .tgz
+    #
+    # If the AddEncoding directives above are commented-out, then you
+    # probably should define those extensions to indicate media types:
+    #
+    AddType application/x-compress .Z
+    AddType application/x-gzip .gz .tgz
+
+    #
+    # AddHandler allows you to map certain file extensions to "handlers":
+    # actions unrelated to filetype. These can be either built into the server
+    # or added with the Action directive (see below)
+    #
+    # To use CGI scripts outside of ScriptAliased directories:
+    # (You will also need to add "ExecCGI" to the "Options" directive.)
+    #
+    #AddHandler cgi-script .cgi
+
+    # For type maps (negotiated resources):
+    #AddHandler type-map var
+
+    #
+    # Filters allow you to process content before it is sent to the client.
+    #
+    # To parse .shtml files for server-side includes (SSI):
+    # (You will also need to add "Includes" to the "Options" directive.)
+    #
+    AddType text/html .shtml
+    AddOutputFilter INCLUDES .shtml
+</IfModule>
+
+#
+# Specify a default charset for all content served; this enables
+# interpretation of all content as UTF-8 by default.  To use the
+# default browser choice (ISO-8859-1), or to allow the META tags
+# in HTML content to override this choice, comment out this
+# directive:
+#
+AddDefaultCharset UTF-8
+
+<IfModule mime_magic_module>
+    #
+    # The mod_mime_magic module allows the server to use various hints from the
+    # contents of the file itself to determine its type.  The MIMEMagicFile
+    # directive tells the module where the hint definitions are located.
+    #
+    MIMEMagicFile conf/magic
+</IfModule>
+
+#
+# Customizable error responses come in three flavors:
+# 1) plain text 2) local redirects 3) external redirects
+#
+#
+# Some examples:
+#ErrorDocument 500 "The server made a boo boo."
+#ErrorDocument 404 /missing.html
+#ErrorDocument 404 "/cgi-bin/missing_handler.pl"
+#ErrorDocument 402 http://www.example.com/subscription_info.html
+#
+
+#
+# EnableMMAP and EnableSendfile: On systems that support it,
+# memory-mapping or the sendfile syscall may be used to deliver
+# files.  This usually improves server performance, but must
+# be turned off when serving from networked-mounted
+# filesystems or if support for these functions is otherwise
+# broken on your system.
+# Defaults if commented: EnableMMAP On, EnableSendfile Off
+#
+#EnableMMAP off
+EnableSendfile on
+
+# Supplemental configuration
+#
+# Load config files in the "/etc/httpd/conf.d" directory, if any.
+IncludeOptional conf.d/*.conf
+[root@server home]#
+
+
+
+
+ServerRoot "/etc/httpd"
+    이 파일 내부에 있는 내용들중에 '상대 경로'를 쓰는 경우 그 앞에 붙혀진다.
+    예를 들어
+    conf.modules.d/*.conf
+    라는 경로가 있다면, 이 경로는 실질적으로
+    /etc/httpd/conf.modules.d/*.conf
+    라는 경로로써 존재하게 된다는 내용이다.
+
+Listen 80
+    '내가 어떤 IP 를 쓰던간에, 80포트로 연결한다.'
+    앞으로 통신할 포트를 뜻한다
+
+#Listen 12.34.56.78:80
+    '12.34.56.78' 아이피에 80 포트로만 연결시키겠다는 의미이다
+
+    만약, 192.168.127.128 , 192.168.127.129 , 192.168.127.130 이렇게 3개의 아이피를 점유하고있을때, 어떤 아이피던 상관없이 모든 곳에서 통신이 가능하게 하려면 'Listen 80' 을 쓰고, 192.168.127.128만 받고싶다면 'Listen 192.168.127.128:80' 을 쓰면 된다.
+
+Include conf.modules.d/*.conf
+    /etc/httpd/conf.modules.d/*.conf 의 내용을 가져오겠다는 내용입니다.
+    (* /etc/httpd/conf.modules.d 디렉터리 안에는 이런 파일들이 있고
+
+    
+    [root@server conf.modules.d]# ll
+    합계 28
+    -rw-r--r-- 1 root root 3739  9월 30  2020 00-base.conf
+    -rw-r--r-- 1 root root  139  9월 30  2020 00-dav.conf
+    -rw-r--r-- 1 root root   41  9월 30  2020 00-lua.conf
+    -rw-r--r-- 1 root root  742  9월 30  2020 00-mpm.conf
+    -rw-r--r-- 1 root root  957  9월 30  2020 00-proxy.conf
+    -rw-r--r-- 1 root root   88  9월 30  2020 00-systemd.conf
+    -rw-r--r-- 1 root root  451  9월 30  2020 01-cgi.conf
+    [root@server conf.modules.d]#
+
+    내용은 대충 이렇게 모듈들이 들어있는 형태입니다 .
+
+    [root@server conf.modules.d]# cat 01-cgi.conf
+    # This configuration file loads a CGI module appropriate to the MPM
+    # which has been configured in 00-mpm.conf.  mod_cgid should be used
+    # with a threaded MPM; mod_cgi with the prefork MPM.
+
+    <IfModule mpm_worker_module>
+    LoadModule cgid_module modules/mod_cgid.so
+    </IfModule>
+    <IfModule mpm_event_module>
+    LoadModule cgid_module modules/mod_cgid.so
+    </IfModule>
+    <IfModule mpm_prefork_module>
+    LoadModule cgi_module modules/mod_cgi.so
+    </IfModule>
+
+    [root@server conf.modules.d]# 
+    )
+
+User apache
+Group apache
+    서비스가 동작할때, 어느 사용자의 권한으로 동작하는지에 관한 내용입니다.
+
+# 'Main' server configuration
+    이 다음 내용은 '메인'에 관한 내용이라는것입니다.
+
+ServerAdmin root@localhost
+    관리자 이메일 주소
+
+#ServerName www.example.com:80
+    서버이름 설정
+    네이버의 포털사이의 원래 이름은 www.naver.com.nhoes.com 인데, 이런 서버이름 설정을 따로 해줘서 www.naver.com 이라고 입력해도 접속이 가능하게 해준다.
+
+<Directory [이름]/>
+    [옵션]
+</Directory>
+    이와 같은 형식으로, 전체적인 프로그램의 옵션을 만들어줄 수 있다.
+
+DocumentRoot "/var/www/html"
+    기본적으로 우리가 실질적인 HTML 코드를 넣어놓는 디렉터리 를 뜻하는 옵션입니다.
+    이 경로를 다른것으로 넣어놓는다면 다른 설정도 바꿔야합니다.
+
+
+    DocumentRoot "/var/www/html"
+
+    <Directory "/var/www">
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    <Directory "/var/www/html">
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    이렇게가 기본적인 설정값이라면
+
+    DocumentRoot "/home/ghdwpaks/html"
+
+    <Directory "/home/ghdwpaks/">
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    <Directory "/home/ghdwpaks/html">
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
+
+    바꾸는 경우에 이렇게 한번에 바꿔야한다는 내용입니다.
+
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+    화면에 첫번째로 띄울 파일명을 정해주는 옵션입니다.
+    현재 설정된 값으로는 /var/www/html/index.html 을 맨 처음에 보여준다는 내용입니다.
+    여러 파일을 넣을 수 있으나, 기본적으로 앞쪽에 있을수록 먼저 보여준다. 고 합니다.
+
+
+ErrorLog "logs/error_log"
+    에러 로그를 저장하는 곳입니다.
+    /var/www/html/logs/error_log 라는 파일 속에 저장된다고 합니다. 
+
+LogLevel warn
+    저장되는 로그의 수준을 나타내는 곳입니다.
+    로그를 어느정도 레벨로써 기록하겠다는 내용이기도 합니다. 종류로써는 (윗줄줄에 있는 각주의 내용을 토대로) debug, info, notice, warn, error, crit, alert, emerg 같은 종류들이 있으며, debug 에 가까울수록 사소한것까지 기록합니다.
+
+AddDefaultCharset UTF-8
+    아파치 서버가 쓰는 기본 문자 인코딩 방식입니다.
+
+
+IncludeOptional conf.d/*.conf
+    이 파일에서 서술하지 못한 추가적인 내용들이 담긴 경로입니다.
+    /var/www/html/conf.d/ 디렉터리 안에 있는 .conf 로 끝나는 이름을 가지는 파일들에 들어있다고 합니다.
+

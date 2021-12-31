@@ -1,0 +1,22 @@
+DB server
+    - Database server, 데이터베이스 모아놓은 서버
+    - 인터넷의 보급, 스마트폰의 개발 및 보급에 따라 인터넷의 활용이 급속도로 늘어났고, 무수히 많은 데이터 생성
+        > 많은 데이터들을 효율적으로 저장 및 관리하기 위해 database 를 사용
+    -CentOS 는 6 버전까지는 mysql 이라는 DB 서버를 사용했으나
+        mysql 이 유료화되면서 CentOS 7 버전부터는 mysql 의 마이너 카피인 mariadb(마리아디비)를 사용
+    
+    - 정보
+        패키지  : mariadb-*
+        데몬    : mariadb
+        방화벽  : service=mysql
+        설정파일: /etc/my.cnf       << DB server 동작 자체에 영향을 끼칩니다
+                 (database) mysql  << DB server 내부에서 각종 설정들
+    -접속 명령어
+        mysql -u <DB server 계정> -p [<사용할 database 이름>]
+        mysql -u root -p mysql
+
+        ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+        같은 오류가 발생하는 이유는 데몬이 실행중이지 않기 때문일 수도 있습니다.
+
+    - 설치
+        yum -y install mariadb-*

@@ -1,0 +1,28 @@
+이 문서는
+mysql 의 mariadb 에 관한 내용을 다루는
+전체적인 명령어 체계와 예시를 서술합니다.
+
+
+접속
+    mysql -u <DB server 계정> -p [<사용할 database 이름>]
+    mysql -u root -p mysql
+
+    ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
+    같은 오류가 발생하는 이유는 데몬이 실행중이지 않기 때문일 수도 있습니다.
+
+화면 청소
+    system clear;
+    을 입력해서 명령어로 화면을 청소해줄 수도 있지만
+
+    ctrl + L
+    단축키로 청소할 수도 있습니다.
+
+select version(), current_date, current_time;
+    서버에 세팅된 날짜와 시간을 볼 수 있게 해주는 명령어
+    버전의 경우에는 유틸리티를 사용하기 위해서 반드시 알고있어야하는 요소입니다.
+
+
+
+
+
+

@@ -2,6 +2,12 @@
 mysql 의 mariadb 에 관한 내용을 다루는
 전체적인 명령어 체계와 예시를 서술합니다.
 
+;
+    모든 명령어 및 행동에는 끝에 세미콜론(;)을 붙혀야 합니다.
+
+탈출
+    \c
+    '> 나 -> 같은 구문만 나오고, 다른 명령어를 입력할 수 없는 경우 \c 를 입력해서 탈출할 수 있습니다.
 
 접속
     mysql -u <DB server 계정> -p [<사용할 database 이름>]
@@ -9,6 +15,10 @@ mysql 의 mariadb 에 관한 내용을 다루는
 
     ERROR 2002 (HY000): Can't connect to local MySQL server through socket '/var/lib/mysql/mysql.sock' (2)
     같은 오류가 발생하는 이유는 데몬이 실행중이지 않기 때문일 수도 있습니다.
+
+변경점 저장
+    systemctl restart mariadb
+    로 데몬 재실행을 시켜줘야합니다.
 
 화면 청소
     system clear;
@@ -21,8 +31,193 @@ select version(), current_date, current_time;
     서버에 세팅된 날짜와 시간을 볼 수 있게 해주는 명령어
     버전의 경우에는 유틸리티를 사용하기 위해서 반드시 알고있어야하는 요소입니다.
 
+출력
+    show [객체]
+    예시 :
+    show databases;
+    show tables; -> 내가 현재 사용중인 데이터베이스 내부에 있는 table 목록을 보여줌(맨 밑줄에 24 rows in set 같은 내용으로 갯수를 알려줌)
+    
+db table과 user table을 사용할 예정
+user table에서 사용자 관리와 DB 서버 전체를 관리함
+db table은 특정 DB 에 대한 권한을 관리함
+
+생성
+    create database [DB 이름];
+    create database db_ghd;
+    데이터베이스 만드는 명령어
+
+    create table [table 이름] ([컬럼명] [형식]([byte 단위의 수용량]))
+    create table tb_ghd (num int(3), name char(20));
+    tb_ghd 이라는 이름의 table에다가
+    num 이라는 정수형 3 byte 까지 받을 수 있는 컬럼 하나와
+    name 이라는 문자형 20 byte 까지 받을 수 있는 컬럼 하나를 포함하여 생성한다는 내용입니다.
+
+    근데 우리가 배우는 숫자 체계에서 int 형식의 변수는 4 byte, 문자는 2 byte 로 배우게 되는데
+    데이터베이스에 경우에는 조금 다르게 '자릿수'와 '크기'의 개념으로써 들어가게 됩니다.
+    그러니까 위에 적힌 num int(3) 은 0~999 까지 받는다는 내용이고, name char(20) 은 눈에 보이지 않는 끝자리의 온점 하나(.)를 제외한 영어, 특수문자 등등의 아스키코드에서 사용되는 문자들을 19개까지 넣을 수 있다는 내용입니다.
+
+    create table tb_ghd;
+    table 만드는 명령어
+    다만, 모든 table은 하나 이상의 컬럼이 필요하기 때문에 이 명령어만 쓰고서는 아무것도 할 수 없거나, 필연적으로 에러가 따라붙습니다.
+
+전환 or 사용
+    use [목표물];
+    use db_ghd;
+    db_ghd 을 사용하는 상태로 전환시키기
+    이 use 명령어 뒤에 들어가는건 무조건 DB 이름이여야한다.
+
+정보 확인
+    desc [DB 이름];
+    desc db_ghd;
+
+    MariaDB [dbitbank]> desc db_ghd;
+    +-------+----------+------+-----+---------+-------+
+    | Field | Type     | Null | Key | Default | Extra |
+    +-------+----------+------+-----+---------+-------+
+    | num   | int(3)   | YES  |     | NULL    |       |
+    | name  | char(20) | YES  |     | NULL    |       |
+    +-------+----------+------+-----+---------+-------+
+    2 rows in set (0.00 sec)
+    
+    이런식으로 출력될 수 있는데 각 값들에 대한 내용을 출력합니다.
+    Field   : 필드 이름
+    Type    : 필드 자료형과 길이
+    Null    : Null 값 허용 여부
+    Key     : 키 지정 관련 여부
+    Default : 기본값 지정 여부
+    Extra   : 기타사항
+    이 desc 명령어 뒤에 들어가는건 무조건 table 이름이여야한다.
+
+삭제
+    drop [db 이름];
+    drop [table 이름];
+
+    delete from [table 이름] where [조건식];
+    delete from user where user=' ';
+    user 테이블에서 user 컬럼의 값이 ' ' 인 유저를 삭제한다. 
+
+추가
+    insert
+
+    insert into user(host, user, password) values ('localhost','userghd',password('ghdwpaks'));
+
+    user 라는 테이블에 있는 host 에는 'localhost' 라는 값을, user 에는 'userghd' 라는 값을, password 에는 'ghdwpaks' 이라는 값을 넣어준다는 내용입니다.
+    지정해주지 않은 내용은 기본(default)값이 들어가게 되며, primary 같은 기본키마저 비워버리는 경우에는 오류가 뜨게 됩니다.
+
+
+    insert into db values ('localhost','db_ghd','ghduser','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y');
+    이번 경우에는 따로 지정을 해주지 않고, 컬럼값 전부를 넣은 명령어의 모습입니다.
 
 
 
+    
+수정
+    update [table 이름];
+    update user set password=password('ghdwpaks') where user='root';
+    
+    user 테이블에 있는 password 컬럼을 password 컬럼형식으로 된 'ghdwpaks' 으로 바꾸는데, user 컬럼의 값이 root 인 경우에만 바꾸겠다.
 
+
+user
+    이 부분은  mariadb 를 사용하면 대부분 따라오는 mysql 이라는 db 에 관한 내용입니다.
+    그 mysql 이라는 db 안에 있는 user 이라는 table 에 관한 내용입니다.
+    desc user; 이라고 입력하고서, user 테이블에 있는 정보들을 출력하면
+
+    MariaDB [mysql]> desc user;
+    +------------------------+-----------------------------------+------+-----+---------+-------+
+    | Field                  | Type                              | Null | Key | Default | Extra |
+    +------------------------+-----------------------------------+------+-----+---------+-------+
+    | Host                   | char(60)                          | NO   | PRI |         |       |
+    | User                   | char(16)                          | NO   | PRI |         |       |
+    | Password               | char(41)                          | NO   |     |         |       |
+    | Select_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Insert_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Update_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Delete_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Drop_priv              | enum('N','Y')                     | NO   |     | N       |       |
+    | Reload_priv            | enum('N','Y')                     | NO   |     | N       |       |
+    | Shutdown_priv          | enum('N','Y')                     | NO   |     | N       |       |
+    | Process_priv           | enum('N','Y')                     | NO   |     | N       |       |
+    | File_priv              | enum('N','Y')                     | NO   |     | N       |       |
+    | Grant_priv             | enum('N','Y')                     | NO   |     | N       |       |
+    | References_priv        | enum('N','Y')                     | NO   |     | N       |       |
+    | Index_priv             | enum('N','Y')                     | NO   |     | N       |       |
+    | Alter_priv             | enum('N','Y')                     | NO   |     | N       |       |
+    | Show_db_priv           | enum('N','Y')                     | NO   |     | N       |       |
+    | Super_priv             | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_tmp_table_priv  | enum('N','Y')                     | NO   |     | N       |       |
+    | Lock_tables_priv       | enum('N','Y')                     | NO   |     | N       |       |
+    | Execute_priv           | enum('N','Y')                     | NO   |     | N       |       |
+    | Repl_slave_priv        | enum('N','Y')                     | NO   |     | N       |       |
+    | Repl_client_priv       | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_view_priv       | enum('N','Y')                     | NO   |     | N       |       |
+    | Show_view_priv         | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_routine_priv    | enum('N','Y')                     | NO   |     | N       |       |
+    | Alter_routine_priv     | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_user_priv       | enum('N','Y')                     | NO   |     | N       |       |
+    | Event_priv             | enum('N','Y')                     | NO   |     | N       |       |
+    | Trigger_priv           | enum('N','Y')                     | NO   |     | N       |       |
+    | Create_tablespace_priv | enum('N','Y')                     | NO   |     | N       |       |
+    | ssl_type               | enum('','ANY','X509','SPECIFIED') | NO   |     |         |       |
+    | ssl_cipher             | blob                              | NO   |     | NULL    |       |
+    | x509_issuer            | blob                              | NO   |     | NULL    |       |
+    | x509_subject           | blob                              | NO   |     | NULL    |       |
+    | max_questions          | int(11) unsigned                  | NO   |     | 0       |       |
+    | max_updates            | int(11) unsigned                  | NO   |     | 0       |       |
+    | max_connections        | int(11) unsigned                  | NO   |     | 0       |       |
+    | max_user_connections   | int(11)                           | NO   |     | 0       |       |
+    | plugin                 | char(64)                          | NO   |     |         |       |
+    | authentication_string  | text                              | NO   |     | NULL    |       |
+    +------------------------+-----------------------------------+------+-----+---------+-------+
+    42 rows in set (0.00 sec)
+    이와같은 컬럼들이 나오게 되는데, 이번에 서술할 내용은
+    
+    | Host                   | char(60)                          | NO   | PRI |         |       |
+    | User                   | char(16)                          | NO   | PRI |         |       |
+    | Password               | char(41)                          | NO   |     |         |       |
+    이 부분에 집중되어 있습니다.
+    
+    위에서 차례대로
+
+    Host 에서 사용하는 User 의 Password 가 무엇인지에 관한 내용입니다.
+
+    그리고 그 아래에 있는 priv 관련 컬럼들이 있는데
+    [sql 명령어]_priv
+    같은 형식을 취하고 있습니다.
+    이것들은 Host 에 접속하는 user 가 어떤 권한을 가지고 있는지에 관한 내용들입니다.
+    
+    
+    앞서 말했던 Host , User , Password 에 관해서 출력하면 다음과 같이 나올 수 있습니다.
+    MariaDB [mysql]> select host , user, password from user;
+    +-----------+------+----------+
+    | host      | user | password |
+    +-----------+------+----------+
+    | localhost | root |          |
+    | server    | root |          |
+    | 127.0.0.1 | root |          |
+    | ::1       | root |          |
+    | localhost |      |          |
+    | server    |      |          |
+    +-----------+------+----------+
+    6 rows in set (0.00 sec)
+
+    여러개의 root 사용자도 host 에 따라 여러개로 들어가있는것을 볼 수 있는데, 아무것도 설정해주지 않은 상태라면 대부분 루프 백 주소의 정보를 담고있습니다.
+
+    
+    MariaDB [mysql]> select host, user, password from user;
+    +-----------+------+-------------------------------------------+
+    | host      | user | password                                  |
+    +-----------+------+-------------------------------------------+
+    | localhost | root | *E1B74369B47EB3AD8EF858144E1A0364E3259329 |
+    | server    | root | *E1B74369B47EB3AD8EF858144E1A0364E3259329 |
+    | 127.0.0.1 | root | *E1B74369B47EB3AD8EF858144E1A0364E3259329 |
+    | ::1       | root | *E1B74369B47EB3AD8EF858144E1A0364E3259329 |
+    | localhost |      |                                           |
+    | server    |      |                                           |
+    +-----------+------+-------------------------------------------+
+    6 rows in set (0.00 sec)
+    MariaDB [mysql]>
+    아니면 이렇게 유저의 패스워드가 이상하게 출력되는 경우가 있는데, 이러한 경우는 이상하게 값이 입력됐거나, 출력된게 아니라
+    암호화가 들어가면서 저렇게 보일뿐입니다.
 

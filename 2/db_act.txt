@@ -1,0 +1,58 @@
+yum -y install mariadb-*
+
+systemctl restart mariadb
+
+mysql -u root -p mysql
+
+create database dbtest;
+
+insert into user(host,user,password) values ('localhost','usertest',password('ghdwpaks'));
+
+insert into db values ('localhost','dbtest','usertest','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y');
+
+
+exit
+
+systemctl restart mariadb
+
+mysql -u usertest -p dbtest;
+
+ghdwpaks
+
+insert into tbtest values (1,'ghdwp','non-hyon','010-1234-5678'),(2,'ghdwpaks','gang-nam','010-3412-6587'),(3,'홍제','서울','010-3412-6587');
+
+alter table tbtest modify phone char(14);
+
+update tbtest set phone='010-1111-1111' where num=1;
+
+alter table tbtest add old int(3) after name;
+
+alter tbtest add old int(3) after name;
+
+update tbtest set old=11 where num=1;
+
+alter table tbtest change old age int(3);
+
+alter table tbtest drop addr;
+
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[
+vi /etc/my.cnf
+로 파일을 열어서
+# instructions in http://fedoraproject.org/wiki/Systemd
+같은 내용이 적힌 주석 아래에
+character-set-server = utf8
+collation-server = utf8_general_ci
+을 입력해주고 나와서
+
+systemctl restart mariadb
+으로 데몬을 재실행해줍니다.
+]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]
+
+alter database dbtest default character set utf8;
+commit;
+
+
+alter table tbtest modify name char(20)char set utf8;
+
+update tbtest set name='테스트' where num=3;
+

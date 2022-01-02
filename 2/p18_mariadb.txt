@@ -1,0 +1,371 @@
+
+1. root 로 접속해서 진행
+DataBase    : dbtest
+user        : usertest
+
+2. usertest 로 접속해서 진행
+table   : tbtest
+field   : num, name, addr, phone
+values  : 3개 이상
+
+
+문제 해결 :
+0. mysql , mariadb 설치 및 데몬 재실행
+1. DB 생성 및 유저 생성
+2. table 및 field 생성
+3. table 에 column 값 넣기
+
+
+0. mysql , mariadb 설치 및 데몬 재실행
+
+    yum -y install mariadb-*
+    로 설치하고, 완료되면
+
+    systemctl restart mariadb
+    입력해서 데몬 재실행
+
+1. DB 생성 및 유저 생성 
+    mysql -u root -p mysql
+    mysql 접속하는데, 사용할 유저가 root 이고, 사용할 DB 는 mysql 이라는 뜻
+
+    create database dbtest;
+    우리가 쓸 DB 만들어주고
+
+    insert into user(host,user,password) values ('localhost','usertest',password('ghdwpaks'));
+    localhost 가 호스트고
+    usertest 가 이름이고
+    ghdwpaks 이 이름인 계정을 생성하기
+
+    insert into db values ('localhost','dbtest','usertest','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y');
+    'y' 의 갯수는 19개이며 각 명령어 사용 가능 여부에 관한 '사용가능'처리를 하기 위해 넣은 내용이다.
+    localhost 는 접속자 호스트를 뜻하고
+    dbtest 는 권한을 적용받을 DB 를 뜻하고
+    usertest 는 권한을 적용받을 유저의 이름을 뜻한다.
+
+    exit
+    로 '앞서 생성한 usertest 를 사용하기 위해' 나온다.
+
+2. table 및 field 생성
+    systemctl restart mariadb
+
+    mysql -u usertest -p dbtest;
+    usertest 계정으로 dbtest 에 접속한다는 내용이다.
+
+    ghdwpaks
+    으로 아까 설정해줬던 비밀번호를 넣어준다
+
+    create table tbtest (num int(3), name char(20), addr char(80), phone int(14));
+
+    이렇게 table 과 field 까지 생성하는게 끝났다.
+
+3. table 에 column 값 넣기
+    
+    명령어의 구성은 다음과 같다.
+    insert into tbtest values ([숫자],'[단어]','[단어]','[예의상 전번]'){,([숫자],'[단어]','[단어]','[예의상 전번]')}
+    숫자는 3자리숫자 이내의 숫자를 뜻하고,
+    단어는 각각 20자리와 80 자리를 넘기지 않도록 하고
+    예의상 전번이라는것은 123같은 일반적인 숫자여도 상관 없으나 그저 예의상 010-1234-5678 같이 14자리 안의 숫자를 넣어주는것을 뜻한다.
+    
+    예를 들면
+    insert into tbtest values (1,'ghdwp','non-hyon','010-1234-5678');
+    같이 입력할수도 있고,
+    insert into tbtest values (1,'ghdwp','non-hyon','010-1234-5678'),(2,'ghdwpaks','gang-nam','010-3412-6587'),(3,'홍제','서울','010-3412-6587');
+    같이 입력할 수도 있다.
+
++ 결과값 이해와 문제해결
+    select * from tbtest;
+    을 입력해서 우리가 넣은 값들을 출력해보면 다음과 같이 나올 가능성이 크다.
+    
+    +------+----------+----------+-------+
+    | num  | name     | addr     | phone |
+    +------+----------+----------+-------+
+    |    1 | ghdwp    | non-hyon |    10 |
+    |    2 | ghdwpaks | gang-nam |    10 |
+    |    3 | ??       | ??       |    10 |
+    +------+----------+----------+-------+
+    3 rows in set (0.00 sec)
+
+    우선 phone 필드부터 보자면 10으로 들어가있는것을 볼 수 있다.
+    이는 010-1234-5678 이라는 값을 예시로 들자면
+    010-1234-5678 에서 마이너스 표시는 인식하지 못하기 때문에 010 만 인식한다.
+    그리고 정수 표기법상 0 이 앞에 올 수 없기 때문에 10 만이 표현되는것이다.
+
+    그리고 3번째 컬럼의
+    name 과 addr 필드에 넣었던 한글 데이터가 전부 깨진것을 볼 수 있다.
+
+    
+    이제부터 문제를 고쳐주기 시작할텐데, 우선 전번은 문자형으로 바꿔준다.
+
+    alter table tbtest modify phone char(14);
+
+    update tbtest set phone='010-1111-1111' where num=1;
+
+
+    이제 한글 증상을 고치기 위해서
+    exit
+    를 해서, 다시
+
+    mysql -u root -p mysql
+    로 다시 들어와준다.
+
+    show variables like 'c%';
+    를 입력했을때 아래와 같이 나올 가능성이 큰데,
+
+    MariaDB [mysql]> show variables like 'c%';
+    +--------------------------+----------------------------+
+    | Variable_name            | Value                      |
+    +--------------------------+----------------------------+
+    | character_set_client     | utf8                       |
+    | character_set_connection | utf8                       |
+    | character_set_database   | latin1                     |
+    | character_set_filesystem | binary                     |
+    | character_set_results    | utf8                       |
+    | character_set_server     | latin1                     |
+    | character_set_system     | utf8                       |
+    | character_sets_dir       | /usr/share/mysql/charsets/ |
+    | collation_connection     | utf8_general_ci            |
+    | collation_database       | latin1_swedish_ci          |
+    | collation_server         | latin1_swedish_ci          |
+    | completion_type          | NO_CHAIN                   |
+    | concurrent_insert        | AUTO                       |
+    | connect_timeout          | 10                         |
+    +--------------------------+----------------------------+
+    14 rows in set (0.00 sec)
+
+    MariaDB [mysql]>
+    이중에서 주목해야할것은
+    character_set_database   | latin1   
+    character_set_server     | latin1 
+    collation_database       | latin1_swedish_ci
+    collation_server         | latin1_swedish_ci
+    시스템의 핵심이 라틴어 인코더 형식이 적용되어있는것들이다.
+
+    이제부터 이러한 인코딩 형식들을 전부 utf-8로 바꿔줄것이다.
+
+    exit
+    를 입력해서 DB 를 나오고
+
+    vi /etc/my.cnf
+    로 파일을 들어간다.
+    (파일 내용 예시 :
+    [root@server ~]# cat /etc/my.cnf
+    [mysqld]
+    datadir=/var/lib/mysql
+    socket=/var/lib/mysql/mysql.sock
+    # Disabling symbolic-links is recommended to prevent assorted security risks
+    symbolic-links=0
+    # Settings user and group are ignored when systemd is used.
+    # If you need to run mysqld under a different user or group,
+    # customize your systemd unit file for mariadb according to the
+    # instructions in http://fedoraproject.org/wiki/Systemd
+
+    [mysqld_safe]
+    log-error=/var/log/mariadb/mariadb.log
+    pid-file=/var/run/mariadb/mariadb.pid
+
+    #
+    # include all files from the config directory
+    #
+    !includedir /etc/my.cnf.d
+
+    [root@server ~]#
+    )
+    # instructions 주석 아래에
+    character-set-server = utf8
+    collation-server = utf8_general_ci
+    이라는 내용을 넣고, vi 를 종료한다.
+
+    (*파일 결과물
+    [root@server ~]# cat /etc/my.cnf
+    [mysqld]
+    datadir=/var/lib/mysql
+    socket=/var/lib/mysql/mysql.sock
+    # Disabling symbolic-links is recommended to prevent assorted security risks
+    symbolic-links=0
+    # Settings user and group are ignored when systemd is used.
+    # If you need to run mysqld under a different user or group,
+    # customize your systemd unit file for mariadb according to the
+    # instructions in http://fedoraproject.org/wiki/Systemd
+    character-set-server = utf8
+    collation-server = utf8_general_ci
+
+    [mysqld_safe]
+    log-error=/var/log/mariadb/mariadb.log
+    pid-file=/var/run/mariadb/mariadb.pid
+
+    #
+    # include all files from the config directory
+    #
+    !includedir /etc/my.cnf.d
+
+    [root@server ~]#
+    )
+    그리고 데몬을 재시작해준다.
+
+    systemctl restart mariadb
+
+    그리고 다시 mysql 을 들어가서
+    mysql -u root -p mysql
+
+    show variables like 'c%';
+    이라고 입력해줬을때
+
+    MariaDB [mysql]> show variables like 'c%';
+    +--------------------------+----------------------------+
+    | Variable_name            | Value                      |
+    +--------------------------+----------------------------+
+    | character_set_client     | utf8                       |
+    | character_set_connection | utf8                       |
+    | character_set_database   | utf8                       |
+    | character_set_filesystem | binary                     |
+    | character_set_results    | utf8                       |
+    | character_set_server     | utf8                       |
+    | character_set_system     | utf8                       |
+    | character_sets_dir       | /usr/share/mysql/charsets/ |
+    | collation_connection     | utf8_general_ci            |
+    | collation_database       | utf8_general_ci            |
+    | collation_server         | utf8_general_ci            |
+    | completion_type          | NO_CHAIN                   |
+    | concurrent_insert        | AUTO                       |
+    | connect_timeout          | 10                         |
+    +--------------------------+----------------------------+
+    14 rows in set (0.00 sec)
+
+    MariaDB [mysql]>
+    이 출력문중에서
+    character_set_client     | utf8
+    character_set_connection | utf8
+    character_set_database   | utf8
+    character_set_results    | utf8
+    character_set_server     | utf8
+    character_set_system     | utf8
+    collation_connection     | utf8_general_ci
+    collation_database       | utf8_general_ci
+    collation_server         | utf8_general_ci
+    이렇게 'latin1' 없이 utf8 만 가득하다면 성공적으로 한글을 넣을 수 있는 상태가 된다.
+
+    근데 여기서 끝나지 않고, 실질적으로
+    exit 한다음
+    mysql -u usertest -p dbtest
+    로 우리가 적용시켜야할 dbtest 라는 이름의 db 에 들어가본다음
+    status;
+    를 입력해서 상태를 살펴봤을때
+
+    MariaDB [dbtest]> status;
+    --------------
+    mysql  Ver 15.1 Distrib 5.5.68-MariaDB, for Linux (x86_64) using readline 5.1
+
+    Connection id:          3
+    Current database:       dbtest
+    Current user:           usertest@localhost
+    SSL:                    Not in use
+    Current pager:          stdout
+    Using outfile:          ''
+    Using delimiter:        ;
+    Server:                 MariaDB
+    Server version:         5.5.68-MariaDB MariaDB Server
+    Protocol version:       10
+    Connection:             Localhost via UNIX socket
+    Server characterset:    utf8
+    Db     characterset:    latin1
+    Client characterset:    utf8
+    Conn.  characterset:    utf8
+    UNIX socket:            /var/lib/mysql/mysql.sock
+    Uptime:                 8 min 14 sec
+
+    Threads: 1  Questions: 41  Slow queries: 0  Opens: 16  Flush tables: 2  Open tables: 42  Queries per second avg: 0.082
+    --------------
+
+    MariaDB [dbtest]>
+
+    이중에서
+
+    Db     characterset:    latin1
+    이 부분처럼, Db 의 characterset (언어 인코딩 설정) 이 아직도 'latin1'인것을 볼 수 있다.
+
+    alter database dbtest default character set utf8;
+    입력해주고
+
+    commit;
+    커밋해준다.
+
+    그리고 다시
+    status;
+    로 확인해보면
+
+    
+    MariaDB [dbtest]> status
+    --------------
+    mysql  Ver 15.1 Distrib 5.5.68-MariaDB, for Linux (x86_64) using readline 5.1
+
+    Connection id:          3
+    Current database:       dbtest
+    Current user:           usertest@localhost
+    SSL:                    Not in use
+    Current pager:          stdout
+    Using outfile:          ''
+    Using delimiter:        ;
+    Server:                 MariaDB
+    Server version:         5.5.68-MariaDB MariaDB Server
+    Protocol version:       10
+    Connection:             Localhost via UNIX socket
+    Server characterset:    utf8
+    Db     characterset:    utf8
+    Client characterset:    utf8
+    Conn.  characterset:    utf8
+    UNIX socket:            /var/lib/mysql/mysql.sock
+    Uptime:                 13 min 32 sec
+
+    Threads: 1  Questions: 50  Slow queries: 0  Opens: 16  Flush tables: 2  Open tables: 42  Queries per second avg: 0.061
+    --------------
+
+    MariaDB [dbtest]>
+
+    이 출력문들중에서
+    Db     characterset:    utf8
+    를 보면, DB 의 characterset 이 utf8 로 바뀌어져있는것을 알 수 있다.
+
+    근데 이 변경점들은 이 수정과정을 거친 이후부터 만들어지는 테이블들에 적용될 내용이고,
+    이미 만들어진 테이블에서는 적용되지 않는 부분들이니
+    만약에 이미 만들어진 테이블에서도 적용시키고싶다면 다음 과정을 추가적으로 거쳐야한다.
+
+    alter table tbtest modify name char(20)char set utf8;
+    alter table tbtest modify phone char(14)char set utf8;
+
+    alter table [테이블 이름] modify [필드 이름] [자료형]([필드 크기]) [자료형] set utf8;
+
+    그리고 다시
+    update tbtest set name='테스트' where num=3;
+    라고 한글을 입력해준다음에
+
+    select * from tbtest;
+    로 출력해주면
+
+    MariaDB [dbtest]> select * from tbtest;
+    +------+-----------+------+---------------+
+    | num  | name      | age  | phone         |
+    +------+-----------+------+---------------+
+    |    1 | ghdwp     |   11 | 010-1111-1111 |
+    |    2 | ghdwpaks  | NULL | 10            |
+    |    3 | 테스트    | NULL | 10            |
+    +------+-----------+------+---------------+
+    3 rows in set (0.01 sec)
+
+    MariaDB [dbtest]>
+    정상적으로 한글이 들어가있는것을 확인할 수 있다.
+    
+
+    그리고 하나의 예시로써, 나이를 나타내기 위해 old 라는 field 를 추가하고싶다면
+    alter table tbtest add old int(3) after name;
+    
+    이렇게 추가하고,
+
+    필드의 이름을 바꾸고싶다면 이렇게 바꾸면 된다.
+    alter table tbtest change old age int(3);
+    old 라는 필드를 age 라는 이름으로 바꾼다는 내용이다.
+
+    alter table tbtest drop addr;
+    addr 이라는 field 는 쓸곳이 딱히 없어보이니, 삭제하도록 한다.
+
+
+

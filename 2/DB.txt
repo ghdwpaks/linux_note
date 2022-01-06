@@ -28,3 +28,6 @@ DB server
         field   : table 에 저장되는 데이터들의 종류 (= column)
         value   : field 에 맞춰서 table 에 저장되는 데이터
         
+
+
+

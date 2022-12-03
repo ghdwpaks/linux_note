@@ -1,0 +1,78 @@
+리눅스의 IPv4 : 192.168.127.128
+
+1.윈도우에서 리눅스로 파일전송
+윈도우측에서 리눅스로부터 가져올 파일 : ini.txt
+
+2.리눅스에서 윈도우로 파일전송
+윈도우측에서 리눅스에게 넘겨줄 파일 : index.txt
+
+문제 해결 :
+
+리눅스에서 입력해줄것들 :
+    yum -y install vsftpd-*
+    systemctl restart vsftpd
+    firewall-cmd --permanent --add-service=ftp
+    firewall-cmd --reload
+
+    해석 :
+        yum -y install vsftpd-*
+        vsftpd 서비스를 yum 으로 다운로드하기
+
+        systemctl restart vsftpd
+        데몬 (재)실행
+
+        firewall-cmd --permanent --add-service=ftp
+        firewall(방화벽) 예외처리
+
+        firewall-cmd --reload
+        firewall(방화벽) 예외처리 적용
+
+리눅스에서 해줘야하는것들 :
+    1. 유저 생성
+        useradd user1
+    2. 생성한 유저 비번 설정
+        passwd user1
+    3. 윈도우에게 넘겨줄 파일 만들기
+        cd ~user1
+        echo "Hello world, I'm ini text file." >> ini.txt
+
+윈도우에서 입력해줘야하는것들 :
+    cd /
+    mkdir /ghdwpaks
+    cd /ghdwpaks
+    ftp 192.168.127.128
+    
+    cd /                : 최상위 디렉터리 이동
+    mkdir /ghdwpaks     : ini.txt 를 받고, index.txt 를 넘겨줄 디렉터리 생성
+    cd /ghdwpaks        : 이동
+    copy con index.txt  : index.txt 생성. 내용 대충 입력해주고 Ctrl + C 입력해서 입력종료하기.
+    ftp 192.168.127.128 : ftp 접속
+
+    user1 이름 치고 아까 설정한 비밀번호 입력하기
+    get ini.txt
+    입력해서 ini.txt 파일 가져오기
+    put index.txt
+    입력해서 index.txt 파일 넘겨주기
+
+    quit 로 접속 종료
+
+
+
+
+
++가능한 추가적인 행동들
+    ftp 는 ssh 와 비슷한 맥락이지만 파일만 전달하고 받을 수 있습니다.
+    하지만 그중에서도
+
+    cd
+        같이 작업 폴더 이동과 같은 행위들을 할 수 있기도 하고
+
+    pwd
+        같이 자신이 어떤 위치에서 작업하고 있는지도 알려줍니다. 하지만
+        웬만한 경우에는 "/" 라고 출력되면 최상위 디렉터리라고 알려주는데, 이는 사실 진짜 최상위 디렉터리가 아니라 '접속한 유저의 권한으로 움직일 수 있는 최상위 디렉터리' 입니다.
+        ftp 에서는 리눅스에서 (웬만하면)root 로만 올라갈 수 있게 되어있는 진짜 최상위 디렉터리인 / 까지 못올라간다는 내용입니다.
+
+    ls
+    ls -al
+        등등의 명령어도 쓸 수 있습니다.
+

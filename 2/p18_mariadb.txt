@@ -34,7 +34,7 @@ values  : 3개 이상
     insert into user(host,user,password) values ('localhost','usertest',password('ghdwpaks'));
     localhost 가 호스트고
     usertest 가 이름이고
-    ghdwpaks 이 이름인 계정을 생성하기
+    ghdwpaks 이 비밀번호인 계정을 생성하기
 
     insert into db values ('localhost','dbtest','usertest','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y','y');
     'y' 의 갯수는 19개이며 각 명령어 사용 가능 여부에 관한 '사용가능'처리를 하기 위해 넣은 내용이다.

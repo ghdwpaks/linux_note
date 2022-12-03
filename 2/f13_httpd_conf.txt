@@ -475,6 +475,10 @@ DocumentRoot "/var/www/html"
     화면에 첫번째로 띄울 파일명을 정해주는 옵션입니다.
     현재 설정된 값으로는 /var/www/html/index.html 을 맨 처음에 보여준다는 내용입니다.
     여러 파일을 넣을 수 있으나, 기본적으로 앞쪽에 있을수록 먼저 보여준다. 고 합니다.
+    
+    만약에 여러 파일들을 설정해주고싶다면
+    DirectoryIndex index.html index.php
+    같이 그저 뒤에 추가해주면 됩니다.
 
 
 ErrorLog "logs/error_log"

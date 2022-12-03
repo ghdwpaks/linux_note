@@ -1,0 +1,75 @@
+php 다운로드 및 적용
+
+
+
+https://www.phpmyadmin.net
+에 접속한 다음 상단 메뉴 바에 맨 오른쪽에 있을 Download 버튼을 눌러서 페이지를 이동해야합니다.
+
+그 아래에 
+Older Releases 라고 비교적 큰 폰트로 써져있는 문단에서 'You can find older releases on separate files page. You can also get them from our Git repository (check developer information for instructions). Older releases are unsupported.' 이라고 적혀있고, 'separate files page'라는 문단이 하이퍼링크로 걸려있을텐데, 그곳으로 들어가줍니다.
+
+Releases 라는 항목이 4.4.15.10 라고 되어있는 곳으로 가서 오른쪽에 있는 zip 파일 하이퍼링크를 타고 다운로드를 해줍니다.
+
+
+리눅스 환경에서는
+yum -y install vsftpd-*
+systemctl restart vsftpd
+firewall-cmd --permanent --add-service=ftp
+firewall-cmd --reload
+
+
+윈도우 CMD 환경에서
+(서버 아이피가 192.168.127.128 인경우)
+다운로드 해준 파일이 있는 디렉터리로 이동해서
+ftp 192.168.127.128
+ftp 에 접속해준다.
+
+
+main 으로 접속해주고
+cd public_html
+put phpMy*
+를 입력해서, 다운로드한 파일을 ftp 로 전송해주고
+
+quit
+나옵니다
+
+다시 리눅스로 돌아와서,
+cd ~main/public_html 
+이동하고
+
+unzip php*
+다운로드 받은 파일을 풀어주고
+
+mv phpmyadmin-4.4.15.10-all-languages db
+그 파일의 이름 db 로 바꿔준다
+
+
+vi /etc/httpd/conf/httpd.conf
+로 파일을 열어주고
+
+<IfModule dir_module>
+    DirectoryIndex index.html
+</IfModule>
+처럼 되어있는 구문을
+
+<IfModule dir_module>
+    DirectoryIndex index.html index.php
+</IfModule>
+바꿔주고 저장하고 나온다
+
+systemctl restart httpd
+그리고 시스템을 재시작해준다
+
+
+그리고 다시 www.lingus.com/db/ 같은 경로로 이동했을때 php 코드가 그대로 보일 수 있습니다.
+이 경우에는 리눅스 서버에서 php 언어에 대한 정보를 가지고있지 않아서 일어나는 일입니다.
+
+yum -y install php-* --skip-broken
+다운로드 해줍니다.
+
+--skip-broken
+옵션은 php 5와 db 버전의 충돌을 무시하기 위한 옵션입니다.
+
+systemctl restart httpd
+httpd 데몬 재실행
+
